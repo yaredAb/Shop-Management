@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="total-sale">
-        <h2>Todays Sale: <span>{{$todaySale}} Birr</span></h2>
+        <h2>Today's Sale: <span>{{number_format($todaySale)}} Birr</span></h2>
         <p>{{now()->format('M d, Y')}}</p>
     </div>
 
@@ -24,17 +24,15 @@
 
     <div class="product-section">
         <div class="products-wrapper">
-            @if (session('success'))
-                <div class="alert">{{session('success')}}</div>
-            @endif
-            @if (session('error'))
-                <div class="alert">{{session('error')}}</div>
-            @endif
             <div class="products-row">
                 @foreach ($products as $product)
                     <div class="product">
                         @if ($product->category && $product->category->image)
                             <img src="{{asset('storage/'. $product->category->image)}}" alt="{{$product->name}}">
+                        @else
+                            <div class="no-image">
+                                <h3>SHOP</h3>
+                            </div>
                         @endif
                         
                         <p>{{$product->name}}</p>
@@ -44,7 +42,7 @@
                                 <span class="low-stock">Low Stock!</span>
                             @endif
                         </div>
-                        <span>{{$product->sale_price}} Birr</span>
+                        <span>{{number_format($product->sale_price)}} Birr</span>
                         <form action="{{route('cart.add', $product->id)}}" method="POST">
                             @csrf
                             <button type="submit">Add to cart</button>
@@ -64,7 +62,7 @@
                 @if (count($cart) > 0)
                     @foreach ($cart as $id=>$item)
                         <div class="cart-product">
-                            <p><strong>{{$item['name']}}</strong></p>
+                            <p class="cart-name">{{$item['name']}}</p>
                             <div class="price-section">
                                 <div class="price-section">
                                     <form action="{{ route('cart.decrease', $id) }}" method="POST">
@@ -79,7 +77,7 @@
                                         <button type="submit">+</button>
                                     </form>
                                 
-                                    <span> X {{$item['price']}}= {{ $item['quantity'] * $item['price'] }} Birr</span>
+                                    <span> X {{number_format($item['price'])}}= {{ number_format($item['quantity'] * $item['price'] )}} Birr</span>
                                 </div>                                
                             </div>
                         </div>
@@ -94,12 +92,12 @@
                     @endphp
                     <div class="cart-total">
                         <hr>
-                        <p><strong>Total: {{$total}} Birr</strong></p>
+                        <p class="total-cart">Total: {{number_format($total)}} Birr</p>
                     </div>
 
                     <form action="{{route('checkout')}}" method="POST">
                         @csrf
-                        <button type="submit">Done Purchase</button>
+                        <button type="submit" class="purchase-btn">Purchase</button>
                     </form>
                         
                     @else

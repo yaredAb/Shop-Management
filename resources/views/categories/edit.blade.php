@@ -1,27 +1,22 @@
 @extends('layouts.app')
 
 @section('content')
-    <h3>edit categories</h3>
 
-    <form action=" {{ route('categories.update', $category)}} " method="POST" enctype="multipart/form-data">
-        @csrf
-        @method('PUT')
-
-        <div>
-            <label for="name">Name</label>
-            <input type="text" name="name" id="name" value="{{$category->name}}" required>
+    <div class="form-container">
+        <div class="form-wrapper">
+            <h2>Edit Product</h2>
+            <form action=" {{ route('categories.update', $category)}} " method="POST" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                <p>Name</p>
+                <input type="text" name="name" id="name" value="{{$category->name}}" required>
+                <p>Image</p>
+                @if($category->image)
+                    <img src="{{ asset('storage/' . $category->image) }}" class="category-form-img">
+                @endif
+                <input type="file" name="image">
+                <button type="submit" class="button">Update</button>
+            </form>
         </div>
-        <div>
-            <label>Image</label><br>
-            <input type="file" name="image" style="margin-bottom:10px;">
-        </div>
-
-        @if($category->image)
-            <img src="{{ asset('storage/' . $category->image) }}" style="width: 200px; height: auto; margin-top: 10px;">
-        @endif
-
-        <div style="margin-top: 10px;">
-            <button type="submit" class="button">Update</button>
-        </div>
-    </form>
+    </div>
 @endsection

@@ -16,7 +16,9 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $products = Product::with('category');
+        $products = Product::with('category')
+            ->where('quantity', '>', 0)
+            ->orderBy('created_at', 'desc');
 
         //applying search
         if($request->filled('product_name')) {
@@ -185,5 +187,13 @@ class ProductController extends Controller
                 'text' => $message
             ]);
         }
+    }
+
+
+    public function listOfProducts() {
+        $products = Product::with('category')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return view('products.listOfProducts', compact('products'));
     }
 }

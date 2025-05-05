@@ -11,16 +11,17 @@
     </style>
 </head>
 <body>
-    <h2>Monthly Sales Report - {{ $month }}</h2>
+    <h2>Monthly Sales Report - {{ \Carbon\Carbon::parse($month)->format('F d, Y') }}</h2>
 
-    <p><strong>Total Revenue:</strong> {{ $totalRevenue }} Birr</p>
+    <p><strong>Total Sale:</strong> {{ number_format($totalRevenue) }} Birr</p>
 
     @if ($topProduct)
         <p><strong>Top Product:</strong> {{ $topProduct->product->name }} ({{ $topProduct->total_quantity }} sold)</p>
     @endif
 
     @if ($topDay)
-        <p><strong>Best Day:</strong> {{ $topDay->day }} ({{ $topDay->total }} Birr)</p>
+        <p><strong>Best Sale Day:</strong> {{ 
+    \Carbon\Carbon::parse($topDay->day)->format('F d, Y')}} ({{ number_format($topDay->total)}} Birr)</p>
     @endif
 </body>
 </html>

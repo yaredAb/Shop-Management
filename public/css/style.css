@@ -1,9 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
 :root{
     --primary: #fff;
     --secondary: #333;
     --bg: #DBDBDB;
     --top: #3A59D1;
     --bottom: #c3cdf7;
+    --bg2: #f0f0f0;
 }
 *{
     margin: 0;
@@ -18,7 +21,12 @@ a{
 input:focus, select:focus{
     outline: none;
 }
-
+button{
+    cursor: pointer;
+}
+body{
+    font-family: "Poppins", sans-serif;
+}
 .wrapper{
     background-color: var(--bg);
     padding: 20px;
@@ -39,6 +47,8 @@ nav{
 nav .logo{
     font-size: 40px;
     color: var(--secondary);
+    font-family: "Josefin sans", sans-serif;
+    font-weight: 600;
 }
 nav ul{
     display: flex;
@@ -91,14 +101,17 @@ nav ul{
 .filtering-section .categories{
     display: flex;
     width: 80%;
-    gap: 10px;
+    overflow-x: scroll;
+    scrollbar-width: none;
 }
 .categories button{
-    padding: 10px;
+    padding: 5px 10px;
     background-color: var(--bg);
     color: var(--secondary);
-    border: 1px solid var(--secondary);
+    border: 2px solid var(--secondary);
     border-radius: 8px;
+    font-size: 18px;
+    margin-left: 10px;
 }
 .product-section{
     display: flex;
@@ -109,6 +122,7 @@ nav ul{
 .products-wrapper{
     width: 80%;
     overflow-y: scroll;
+    scrollbar-width: none;
 }
 .products-row{
     display: flex;
@@ -116,8 +130,8 @@ nav ul{
     gap: 10px;
 }
 .products-row .product{
-    width: 250px;
-    height: 330px;
+    width: 280px;
+    height: 350px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -131,15 +145,41 @@ nav ul{
     height: 200px;
     object-fit: contain;
 }
+.no-image {
+    width: 100%;
+    height: 200px;
+    background-color: var(--bg2);
+    position: relative;
+}
+.no-image h3{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 30px;
+}
 .product p{
     padding: 0;
     margin: 0;
-    font-size: 20px;
+    font-size: 24px;
+    text-transform: capitalize;
 }
 .product span{
     font-size: 16px;
-
 }
+.stock-quantity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.low-stock{
+    background-color: rgb(241, 92, 92);
+    color: var(--primary);
+    padding: 5px;
+    text-transform: capitalize;
+    border-radius: 5px;
+}
+
 .product button{
     padding: 12px;
     background-color: var(--bottom);
@@ -170,6 +210,10 @@ nav ul{
     display: flex;
     flex-direction: column;
     gap: 5px;
+}
+.cart-name{
+    font-weight: 500;
+    text-transform: capitalize;
 }
 .cart-products p{
     font-size: 20px;
@@ -211,6 +255,7 @@ nav ul{
 }
 .form-container h2{
     font-size: 40px;
+    text-transform: capitalize;
 }
 .form-container form{
     display: flex;
@@ -238,6 +283,39 @@ nav ul{
 .form-container p{
     font-size: 20px;
 }
+
+.report-card-container{
+    display: flex;
+    justify-content: space-evenly;
+}
+.report-card{
+    width: 25%;
+    padding: 30px;
+    display: flex;
+    gap: 20px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    color: var(--primary);
+}
+.report-card-container .card-1{
+    background-color: #f87171;
+}
+.report-card-container .card-2{
+    background-color: #60a5fa;
+}
+.report-card-container .card-3 {
+    background-color: #34d399;
+}
+.report-card p{
+    font-size: 20px;
+    font-weight: bold;
+}
+.report-card span {
+    font-size: 30px;
+    font-weight: 400;
+}
 .chart{
     display: flex;
     justify-content: space-evenly;
@@ -254,10 +332,149 @@ nav ul{
    font-size: 18px;
    width: max-content;
 }
-.stock-quantity {
+.order-table{
+    width: 100%;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border-collapse: collapse;
+}
+.order-table thead{
+    background-color: var(--top);
+    color: var(--primary);
+}
+.order-table th,
+.order-table td {
+    border: 2px solid #ccc;
+    padding: 6px;
+    text-align: left;
+}
+
+tr:nth-child(even) {
+    background-color: var(--bg2);
+}
+tr:hover{
+    background-color: #fcfcfc;
+}
+
+.actions{
     display: flex;
     gap: 10px;
 }
-.low-stock{
-    color: red;
+.editBtn{
+    background-color: var(--bg2);
+    color: var(--secondary);
+    padding: 6px;
+    border-radius: 5px;
+    font-weight: 500;
+}
+.deleteBtn{
+    background-color: rgb(241, 92, 92);
+    color: var(--primary);
+    padding: 6px;
+    border: none;
+    border-radius: 5px;
+    font-weight: 500;
+}
+.purchase-btn{
+    background-color: var(--top);
+    padding: 10px;
+    font-size: 18px;
+    border: none;
+    color: var(--primary);
+    border-radius: 5px;
+    width: 100%;
+}
+.category-form-img{
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    background-color: var(--primary);
+}
+
+.cat-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.cat-header a{
+    background-color: var(--bottom);
+    color: var(--secondary);
+    font-size: 18px;
+    border-radius: 5px;
+    padding: 10px;
+}
+.cat-wrapper{
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+.category-card{
+    display: flex;
+    flex-direction: column;
+    height: 300px;
+    width: 300px;
+    background-color: var(--primary);
+    border-radius: 5px;
+    overflow: hidden;
+    padding: 5px;
+    justify-content: space-between;
+}
+.category-card img{
+    height: 200px;
+    width: 100%;
+    object-fit: contain;
+    border-bottom: 1px solid var(--secondary);
+}
+.no-image-2 {
+    width: 100%;
+    height: 200px;
+    background-color: var(--bg2);
+    position: relative;
+    border-bottom: 1px solid var(--secondary);
+}
+.no-image-2 h3{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 30px;
+}
+.category-card h3{
+    font-size: 18px;
+    text-transform: capitalize;
+}
+.cat-action{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+    font-size: 18px;
+}
+.cat-action .editBtn, .cat-action form{
+    width: 50%;
+}
+.cat-action .deleteBtn{
+    width: 100%;
+    font-size: 18px;
+}
+
+.date-filter{
+    display: flex;
+    gap: 10px;
+}
+.date-filter label{
+    font-size: 18px;
+}
+.date-filter input{
+    padding: 10px;
+    border: none;
+    background-color: var(--bottom);
+}
+.date-filter button{
+    background-color: var(--secondary);
+    color: var(--primary);
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
 }

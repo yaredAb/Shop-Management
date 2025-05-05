@@ -11,6 +11,16 @@ use Illuminate\Support\Facades\DB;
 
 class SaleController extends Controller
 {
+
+    public function index() {
+        $orders = Sale::with('product')
+            ->orderBy('sold_at', 'desc')
+            ->get();
+
+        return view('sales.index', compact('orders'));
+    }
+
+
     public function monthlyReport(Request $request) {
         $month = $request->input('month', now()->format('Y-m'));
 
@@ -66,8 +76,8 @@ class SaleController extends Controller
                 ->orderBy('hour')
                 ->get();
 
-                $hourLabels = $hourlySales->pluck('hour')->map(fn($h) => $h . '00');
-                $hourData = $hourlySales->pluck('total');
+            $hourLabels = $hourlySales->pluck('hour')->map(fn($h) => $h . '00');
+            $hourData = $hourlySales->pluck('total');
         
         return view('sales.report', [
             'month' => $month,

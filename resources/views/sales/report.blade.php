@@ -3,21 +3,30 @@
 @section('content')
     <h1 class="text-2xl font-bold mb-4">Monthly Sales Report</h1>
 
-    <form method="GET" action="{{ route('sales.report') }}" class="mb-4">
+    <form method="GET" action="{{ route('sales.report') }}" class="date-filter">
         <label for="month">Select Month:</label>
         <input type="month" name="month" id="month" value="{{ $month }}">
         <button type="submit" class="ml-2 bg-blue-500 text-white px-4 py-2 rounded">Filter</button>
     </form>
 
-    <div class="space-y-4">
-        <p><strong>Total Revenue:</strong> {{ $totalRevenue }} Birr</p>
+    <div class="report-card-container">
+        <div class="report-card card-1">
+            <p>Total Sale</p>
+            <span>{{ number_format($totalRevenue) }} Birr</span>
+        </div>
 
         @if ($topProduct)
-            <p><strong>Top Product:</strong> {{ $topProduct->product->name }} ({{ $topProduct->total_quantity }} sold)</p>
+            <div class="report-card card-2">
+                <p>Top Product</p>
+                <span>{{ $topProduct->product->name }} ({{ $topProduct->total_quantity }} sold)</span>
+            </div>
         @endif
 
         @if ($topDay)
-            <p><strong>Best Day:</strong> {{ $topDay->day }} ({{ $topDay->total }} Birr)</p>
+            <div class="report-card card-3">
+                <p>Best Sold Day</p>
+                <span>{{ \Carbon\Carbon::parse($topDay->day)->format('M d, Y') }} ({{ number_format($topDay->total) }} Birr)</span>
+            </div>
         @endif
     </div>
 

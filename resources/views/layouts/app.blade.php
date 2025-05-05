@@ -9,13 +9,14 @@
 <body>
     <div class="wrapper">
         <nav>
-            <a href="#" class="logo">SHOP</a>
+            <a href="/" class="logo">SHOP</a>
             <ul class="nav-links">
                 <li><a href="{{route('products.index')}}">Shop</a></li>
                 <li><a href="{{route('products.create')}}">Add Product</a></li>
                 <li><a href="{{route('categories.create')}}">Add Category</a></li>
+                <li><a href="{{route('products.list')}}">Products</a></li>
                 <li><a href="{{route('sales.report')}}">Report</a></li>
-                <li><a href="#">Settings</a></li>
+                <li><a href="{{route('sale.index')}}">All Orders</a></li>
             </ul>
         </nav>
         @yield('content')
