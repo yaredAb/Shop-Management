@@ -1,0 +1,189 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\Sale;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+
+class ProductController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
+    {
+        $products = Product::with('category');
+
+        //applying search
+        if($request->filled('product_name')) {
+            $products->where('name', 'like', '%'. $request->product_name . '%');
+        }
+
+        //category filter
+        if($request->filled('category_id')) {
+            $products->where('category_id', $request->category_id);
+        }
+
+        $todaysSale = Sale::whereDate('sold_at', today())->sum(DB::raw('price * quantity'));
+        return view('products.index', [
+            'products' => $products->get(),
+            'categories' => Category::all(),
+            'todaySale' => $todaysSale
+        ]);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        $categories = Category::all();
+        return view('products.create', compact('categories'));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'bought_price' => 'required|numeric',
+            'sale_price' => 'required|numeric',
+            'quantity' => 'required|integer',
+            'category_id' => 'required|exists:categories,id'
+        ]);
+
+        Product::create($request->all());
+
+        return redirect()->route('products.index')->with('success', 'Product created');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Product $product)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Product $product)
+    {
+        $categories = Category::all();
+        return view('products.edit', compact('categories', 'product'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Product $product)
+    {
+        $product->update($request->all());
+        return redirect()->route('products.index')->with('success', 'Product updated');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Product $product)
+    {
+        $product->delete();
+        return redirect()->route('products.index')->with('success', 'Product deleted ');
+    }
+
+    public function addToCart(Request $request, Product $product) {
+        $cart = session()->get('cart', []);
+
+        if(isset($cart[$product->id])) {
+            $cart[$product->id]['quantity']+=1;
+        }
+        else {
+            $cart[$product->id] = [
+                'name' => $product->name,
+                'price' => $product->sale_price,
+                'quantity' => 1
+            ];
+        }
+
+        session()->put('cart', $cart);
+
+        return redirect()->back()->with('success', "{$product->name} added to cart");
+    }
+
+    public function increaseQuantity($id) {
+        $cart = session()->get('cart', []);
+
+        if(isset($cart[$id])) {
+            $cart[$id]['quantity'] += 1;
+            session()->put('cart', $cart);
+        }
+
+        return redirect()->back();
+    }
+
+    public function decreaseQuantity($id){
+        $cart = session()->get('cart', []);
+        if(isset($cart[$id])) {
+            $cart[$id]['quantity'] -= 1;
+
+            if($cart[$id]['quantity'] <= 0) {
+                unset($cart[$id]);
+            }
+            session()->put('cart', $cart);
+        }
+
+        return redirect()->back();
+    }
+
+    public function completeSale() {
+        $cart = session('cart', []);
+
+        if(empty($cart)) {
+            return redirect()->back()->with('error', 'Cart is empty');
+        }
+
+        DB::beginTransaction();
+        try {
+            foreach ($cart as $productId=>$item) {
+                Sale::create([
+                    'product_id' => $productId,
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'sold_at' => now()
+                ]);
+    
+                $product = Product::findOrFail($productId);
+                $product->decrement('quantity', $item['quantity']);
+
+                $updatedProduct = Product::find($productId);
+                $message = "⚠️ Low Stock Alert!\nProduct: {$updatedProduct->name}\nRemaining: {$updatedProduct->quantity}";
+                $this->sendTelegramMessage($updatedProduct, $message);
+            }
+
+            DB::commit();
+    
+            session()->forget('cart');
+            
+            return redirect()->route('product.index')->with('success', 'Sale recorded successfully');
+        }catch(\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to complete sale.');
+        }        
+    }
+
+    public function sendTelegramMessage($product, $message) {
+        if($product->quantity <= 5) {
+            Http::post("https://api.telegram.org/bot". config('services.telegram.bot_token') . "/sendMessage",[
+                'chat_id' => config('services.telegram.chat_id'),
+                'text' => $message
+            ]);
+        }
+    }
+}

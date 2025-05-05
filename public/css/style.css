@@ -1,0 +1,263 @@
+:root{
+    --primary: #fff;
+    --secondary: #333;
+    --bg: #DBDBDB;
+    --top: #3A59D1;
+    --bottom: #c3cdf7;
+}
+*{
+    margin: 0;
+    padding: 0;
+}
+li{
+    list-style: none;
+}
+a{
+    text-decoration: none;
+}
+input:focus, select:focus{
+    outline: none;
+}
+
+.wrapper{
+    background-color: var(--bg);
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-sizing: border-box;
+}
+nav{
+    display: flex;
+    justify-content: space-between;
+    background-color: var(--primary);
+    align-items: center;
+    padding: 10px;
+    border-radius: 5px;
+}
+nav .logo{
+    font-size: 40px;
+    color: var(--secondary);
+}
+nav ul{
+    display: flex;
+    gap: 10px;
+}
+.nav-links li{
+    padding: 10px;
+}
+.nav-links a{
+    color: var(--secondary);
+    font-size: 18px;
+}
+.total-sale{
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--bottom);
+    border-radius: 5px;
+}
+.total-sale h2{
+    font-size: 25px;
+    color: var(--secondary);
+    font-weight: 600;
+}
+.total-sale span{
+    color: var(--top);
+}
+.total-sale p{
+    font-size: 18px;
+}
+
+
+.filtering-section{
+    display: flex;
+    align-items: end;
+    padding: 10px;
+    gap: 20px;
+}
+.filtering-section .search-form{
+    width: 20%;
+}
+.filtering-section input{
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--secondary);
+    font-size: 18px;
+}
+.filtering-section .categories{
+    display: flex;
+    width: 80%;
+    gap: 10px;
+}
+.categories button{
+    padding: 10px;
+    background-color: var(--bg);
+    color: var(--secondary);
+    border: 1px solid var(--secondary);
+    border-radius: 8px;
+}
+.product-section{
+    display: flex;
+    gap: 5px;
+    height: 63vh;
+    overflow: hidden;
+}
+.products-wrapper{
+    width: 80%;
+    overflow-y: scroll;
+}
+.products-row{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.products-row .product{
+    width: 250px;
+    height: 330px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 5px;
+    padding: 5px;
+    background-color: var(--primary);
+}
+.product img{
+    width: 100%;
+    height: 200px;
+    object-fit: contain;
+}
+.product p{
+    padding: 0;
+    margin: 0;
+    font-size: 20px;
+}
+.product span{
+    font-size: 16px;
+
+}
+.product button{
+    padding: 12px;
+    background-color: var(--bottom);
+    color: var(--secondary);
+    border: none;
+    font-size: 18px;
+    width: 100%;
+}
+
+.cart-container{
+    width: 20%;
+    background-color: var(--primary);
+    padding: 10px;
+    height: 100%;
+}
+
+.cart-container h2{
+    font-size: 30px;
+    text-align: center;
+}
+
+.cart-products{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.cart-product{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.cart-products p{
+    font-size: 20px;
+}
+.price-section{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+.price-section button{
+    padding: 4px 8px;
+    font-size: 18px;
+}
+.times-price{
+    color: var(--top);
+}
+.item-numbers{
+    font-size: 18px;
+    color: var(--top);
+}
+
+
+.form-container{
+    padding: 20px;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    
+}
+.form-wrapper{
+    background-color: var(--bottom);
+    padding: 20px;
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.form-container h2{
+    font-size: 40px;
+}
+.form-container form{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.form-container input[type="text"], .form-container input[type="number"], .form-container select{
+    padding: 10px;
+}
+.form-container form input{
+    font-size: 18px;
+}
+.form-container form select{
+    font-size: 18px;
+}
+.form-container form button{
+    padding: 10px;
+    background-color: var(--top);
+    color: var(--primary);
+    border: none;
+    font-size: 18px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+.form-container p{
+    font-size: 20px;
+}
+.chart{
+    display: flex;
+    justify-content: space-evenly;
+}
+.reportChart{
+    width: 600px;
+    height: 400px;
+}
+.exportBtn{
+   color: var(--primary);
+   background-color: var(--top);
+   border-radius: 8px;
+   padding: 10px 15px;
+   font-size: 18px;
+   width: max-content;
+}
+.stock-quantity {
+    display: flex;
+    gap: 10px;
+}
+.low-stock{
+    color: red;
+}
