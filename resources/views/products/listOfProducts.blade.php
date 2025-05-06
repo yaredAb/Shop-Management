@@ -43,11 +43,11 @@
                     <td class="actions">
                         <a href="{{route('products.edit', $product)}}" class="editBtn">Edit</a>
 
-                        <form action="{{route('products.destroy', $product)}}" method="POST">
+                        <form action="{{route('products.destroy', $product)}}" method="POST" onsubmit="return(confirm('Are you sure you want to delete this product?'))">
                             @method('DELETE')
                             @csrf
 
-                            <button class="deleteBtn" onclick="confirm('Are you sure you want to delete this product?')">Delete</button>
+                            <button class="deleteBtn">Delete</button>
                         </form>
                     </td>
                 </tr>

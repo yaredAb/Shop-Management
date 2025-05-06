@@ -15,8 +15,10 @@
                 <li><a href="{{route('products.create')}}">Add Product</a></li>
                 <li><a href="{{route('categories.create')}}">Add Category</a></li>
                 <li><a href="{{route('products.list')}}">Products</a></li>
+                <li><a href="{{route('categories.index')}}">Categories</a></li>
                 <li><a href="{{route('sales.report')}}">Report</a></li>
                 <li><a href="{{route('sale.index')}}">All Orders</a></li>
+                <li><a href="{{route('settings')}}">Settings</a></li>
             </ul>
         </nav>
         @yield('content')

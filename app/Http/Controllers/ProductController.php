@@ -97,7 +97,7 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
-        return redirect()->route('products.index')->with('success', 'Product deleted ');
+        return redirect()->back()->with('success', 'Product deleted ');
     }
 
     public function addToCart(Request $request, Product $product) {
@@ -166,7 +166,12 @@ class ProductController extends Controller
 
                 $updatedProduct = Product::find($productId);
                 $message = "⚠️ Low Stock Alert!\nProduct: {$updatedProduct->name}\nRemaining: {$updatedProduct->quantity}";
-                $this->sendTelegramMessage($updatedProduct, $message);
+                try{
+                    $this->sendTelegramMessage($updatedProduct, $message);
+                } catch(\Exception $e) {
+                    
+                }
+                
             }
 
             DB::commit();

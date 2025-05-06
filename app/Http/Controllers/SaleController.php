@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Models\Sale;
 use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
-use PDF;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class SaleController extends Controller
 {
@@ -123,6 +125,60 @@ class SaleController extends Controller
         ]);
 
         return $pdf->download('Monthly_Sales_Report_' . $month . '.pdf');
+    }
+
+    public function sendDailyReport() {
+        $today = Carbon::today();
+        $sales = Sale::whereDate('sold_at', $today)->get();
+
+        $totalRevenue = $sales->sum(function ($sale) {
+            return $sale->price * $sale->quantity;
+        });
+
+        $lowStockProducts = Product::whereColumn('quantity', '<=', 'stock_threshold')->get();
+
+        $pdf = FacadePdf::loadView('sales.daily_report', [
+            'sales' => $sales,
+            'totalRevenue' => $totalRevenue,
+            'lowStockProducts' => $lowStockProducts,
+            'date' => $today->toFormattedDateString()
+        ]);
+
+        $fileName = 'daily_report_'. $today->format('Y_m_d'). '.pdf';
+        $filePath = storage_path('app/' . $fileName);
+
+        file_put_contents($filePath, $pdf->output());
+
+        //send to telegram
+        Http::attach(
+            'document', file_get_contents($filePath), $fileName)
+            ->post("https://api.telegram.org/bot" . config('services.telegram.bot_token') . "/sendDocument",[
+                'chat_id' => config('services.telegram.chat_id'),
+                'caption' => "📄 Daily Sales Report for " . $today->toFormattedDateString()
+            ]);
+        unlink($filePath);
+
+        return back()->with('success', 'Daily report send to Telegram');
+        
+    }
+
+    public function maybeSendDailyReport() {
+        $current_time = now()->format('H:i');
+        $now = now();
+        $today = $now->toDateString();
+
+        $cacheKey = 'daily_report_sent_'. $today;
+
+
+        if($current_time === '09:52') {
+            $this->sendDailyReport();
+
+            Cache::put($cacheKey, true, now()->endOfDay());
+
+            return response('Report sent at ' . $current_time);
+        }
+
+        return response('Not time yet. Current time is' . $current_time, 200);
     }
 
 

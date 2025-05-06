@@ -32,7 +32,7 @@
 
     <div class="chart">
         <div class="reportChart">
-            <h3>Today's Sale</h3>
+            <h3>This month Sale</h3>
             <canvas id="dailySalesChart"></canvas>
         </div>
         <div class="reportChart">
