@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="auth-wrapper">
-        <form class="login-wrapper" action="{{route('register')}}" method="POST">
+        <form class="login-wrapper" action="{{route('register.submit')}}" method="POST">
             @csrf
             
             <a href="/" class="logo">SHOP</a>
@@ -20,6 +20,10 @@
             <div class="login-form">
                 <label for="password">Password</label>
                 <input type="password" name="password" id="password">
+            </div>
+            <div class="login-form">
+                <label for="password">Confirm Password</label>
+                <input type="password" name="password_confirmation" id="password">
             </div>
             <div class="login-form">
                 <label for="password">Privilage</label>

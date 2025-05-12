@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="text-2xl font-bold mb-4">Monthly Sales Report</h1>
+    <h1 class="title">Monthly Sales Report</h1>
 
     <form method="GET" action="{{ route('sales.report') }}" class="date-filter">
         <label for="month">Select Month:</label>
@@ -62,7 +62,7 @@
             datasets: [{
                 label: 'Daily Sales (Birr)',
                 data: {!! json_encode($chartData) !!},
-                backgroundColor: '#60a5fa',
+                backgroundColor: ['#60a5fa','#333', '#c3cdf7', '#3A59D1'],
                 borderColor: '#3b82f6',
                 borderWidth: 1
             }]

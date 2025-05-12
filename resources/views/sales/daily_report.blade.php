@@ -11,17 +11,6 @@
 <body>
     <h2>Daily Sales Report - {{ $date }}</h2>
     <p><strong>Total Revenue:</strong> {{ $totalRevenue }} Birr</p>
-
-    <h3>Low Stock Products</h3>
-    @if ($lowStockProducts->count())
-        <ul>
-            @foreach ($lowStockProducts as $product)
-                <li>{{$product->name}} - QTY: {{ $product->quantity }}</li>
-            @endforeach
-        </ul>
-    @else
-        <p>No low stock products 🎉</p>
-    @endif
     <table>
         <thead>
             <tr>
@@ -42,5 +31,16 @@
             @endforeach
         </tbody>
     </table>
+
+    <h3>Low Stock Products</h3>
+    @if ($lowStockProducts->count())
+        <ul>
+            @foreach ($lowStockProducts as $product)
+                <li>{{$product->name}} - QTY: {{ $product->quantity }}</li>
+            @endforeach
+        </ul>
+    @else
+        <p>No low stock products 🎉</p>
+    @endif
 </body>
 </html>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\Setting;
 use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -78,7 +79,9 @@ class SaleController extends Controller
                 ->orderBy('hour')
                 ->get();
 
-            $hourLabels = $hourlySales->pluck('hour')->map(fn($h) => $h . '00');
+            $hourLabels = $hourlySales->pluck('hour')->map(function ($h) {
+                return str_pad($h, 2, '0', STR_PAD_LEFT) . ':00';
+            });                
             $hourData = $hourlySales->pluck('total');
         
         return view('sales.report', [
@@ -168,17 +171,19 @@ class SaleController extends Controller
         $today = $now->toDateString();
 
         $cacheKey = 'daily_report_sent_'. $today;
+        $dailyHour = Setting::getValue('daily_hour');
 
 
-        if($current_time === '09:52') {
+        if($current_time >= $dailyHour) {
             $this->sendDailyReport();
 
             Cache::put($cacheKey, true, now()->endOfDay());
 
-            return response('Report sent at ' . $current_time);
+            // return response('Report sent at ' . $current_time . 'as you programmed at ' . $dailyHour);
+            return redirect()->back();
         }
 
-        return response('Not time yet. Current time is' . $current_time, 200);
+        return response('Not time yet. Current time is' . $current_time . '. but you alarmed at ' . $dailyHour, 200);
     }
 
 

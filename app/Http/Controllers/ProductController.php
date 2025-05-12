@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -169,7 +170,7 @@ class ProductController extends Controller
                 try{
                     $this->sendTelegramMessage($updatedProduct, $message);
                 } catch(\Exception $e) {
-                    
+                    log_to_db('error', 'Telegram alert failed');
                 }
                 
             }
@@ -186,9 +187,11 @@ class ProductController extends Controller
     }
 
     public function sendTelegramMessage($product, $message) {
-        if($product->quantity <= 5) {
-            Http::post("https://api.telegram.org/bot". config('services.telegram.bot_token') . "/sendMessage",[
-                'chat_id' => config('services.telegram.chat_id'),
+        $token = Setting::getValue('telegram_bot_token');
+        $chat_id = Setting::getValue('telegram_chat_id');
+        if($product->quantity <= $product->stock_threshold) {
+            Http::post("https://api.telegram.org/bot". $token . "/sendMessage",[
+                'chat_id' => $chat_id,
                 'text' => $message
             ]);
         }

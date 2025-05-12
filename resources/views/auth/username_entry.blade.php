@@ -9,19 +9,18 @@
 </head>
 <body>
     <div class="auth-wrapper">
-        <form class="login-wrapper" method="POST" action="{{route('validate_answer')}}">
+        <form class="login-wrapper" action="{{route('forget_password')}}" method="POST">
             @csrf
+
             <a href="/" class="logo">SHOP</a>
-            <p class="question">{{$user->security_question}}</p>
             <div class="login-form">
-                <label for="answer">Answer</label>
-                <input type="text" name="answer" id="answer" required>
-                <input type="hidden" name="username" value="{{$user->username}}">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username">
             </div>
-            <button type="submit">Validate</button>
+            <button type="submit">Check</button>
         </form>
         <div class="auth-links">
-            <a href="{{route('login')}}">Back to login</a>
+            <a href="{{route('login')}}">back to login</a>
         </div>
     </div>
 </body>
