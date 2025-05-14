@@ -195,7 +195,7 @@ nav ul{
     width: 20%;
     background-color: var(--primary);
     padding: 10px;
-    height: 100%;
+    overflow-y: scroll;
 }
 
 .cart-container h2{
