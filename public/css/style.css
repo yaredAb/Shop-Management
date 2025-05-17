@@ -412,7 +412,7 @@ tr:hover{
     border: none;
     color: var(--primary);
     border-radius: 5px;
-    width: 100%;
+    width: 100%; 
 }
 .category-form-img{
     width: 200px;
