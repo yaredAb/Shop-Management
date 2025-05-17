@@ -1,50 +1,8 @@
+@extends('layouts.clean')
 
-@php
-    $user = Illuminate\Support\Facades\Auth::user();
-    $user_role = $user->privilage;
-
-    $background_color = \App\Models\Setting::getValue('background_color');
-    $primary_color = \App\Models\Setting::getValue('primary_color');
-    $secondary_color = \App\Models\Setting::getValue('secondary_color');
-    $button_color = \App\Models\Setting::getValue('button_color');
-    $site_title = \App\Models\Setting::getValue('site_title');
-@endphp
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="{{asset('css/style.css')}}">
-</head>
-
-<style>
-    :root {
-        --bg: {{ $background_color }};
-        --primary: {{ $primary_color }};
-        --secondary: {{ $secondary_color }};
-        --top: {{ $button_color }};
-    }
-</style>
-<body>
+@section('childContent')
     <div class="wrapper">
-        <nav>
-            <a href="/" class="logo">{{$site_title}}</a>
-            <ul class="nav-links">
-                <li><a href="{{route('products.index')}}">Shop</a></li>
-                <li><a href="{{route('products.create')}}">Add Product</a></li>
-                <li><a href="{{route('categories.create')}}">Add Category</a></li>
-                <li><a href="{{route('products.list')}}">Products</a></li>
-                @if ($user_role === 'admin')
-                    <li><a href="{{route('categories.index')}}">Categories</a></li>
-                    <li><a href="{{route('userList')}}">Users</a></li>
-                    <li><a href="{{route('sales.report')}}">Report</a></li>
-                    <li><a href="{{route('sale.index')}}">All Orders</a></li>
-                    <li><a href="{{route('settings')}}">Settings</a></li>
-                @endif                
-            </ul>
-        </nav>
+        @include('components.navigation')
 
         @php
             use App\Models\Setting;
@@ -60,6 +18,37 @@
 
         @yield('content')
     </div>
-    @yield('scripts')
-</body>
-</html>
+
+    @yield('script')
+@endsection
+
+@section('scripts')
+    <script>
+
+        const toggle_button = document.getElementById('toggle-menu')
+        const menu_container = document.querySelector('.nav-links')
+
+        let isMenuOpen = false
+        toggle_button.addEventListener('click', () => {
+            isMenuOpen = !isMenuOpen
+
+            menu_container.classList.toggle('open', isMenuOpen)
+            toggle_button.src = isMenuOpen ? "{{asset('img/cancel2.png')}}" : "{{asset('img/menu2.png')}}";
+        })
+
+
+        const toggle_cart = document.getElementById('toggleCart')
+        const cart_container = document.querySelector('.mobile-cart')
+
+        let isCartOpen = false
+        toggle_cart.addEventListener('click', () => {
+            isCartOpen = !isCartOpen
+
+            cart_container.classList.toggle('open')
+            toggle_cart.style.transform = isCartOpen ? 'rotate(0deg)' : 'rotate(180deg)'
+        })
+
+    </script>
+@endsection
+
+

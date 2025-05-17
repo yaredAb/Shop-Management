@@ -145,6 +145,43 @@ class ProductController extends Controller
         return redirect()->back();
     }
 
+    public function  updateQuantity(Request $request)
+    {
+        $cart = session('cart', []);
+        $id = $request->input('id');
+        $action = $request->input('action');
+
+        if(isset($cart[$id])) {
+            if($action == 'increase') {
+                $cart[$id]['quantity'] += 1;
+            } else if($action == 'decrease') {
+                if($cart[$id]['quantity'] > 1) {
+                    $cart[$id]['quantity'] -= 1;
+                } else{
+                    unset($cart[$id]);
+                }
+            }
+            session(['cart' => $cart]);
+        }
+
+        $total = 0;
+        foreach ($cart as $item) {
+            $total += $item['price'] * $item['quantity'];
+        }
+
+        if(!empty($cart)) {
+            session()->put('cart_open', true);
+        } else{
+            session()->forget('cart_open');
+        }
+
+        return response()->json([
+            'success' => true,
+            'total' => $total,
+            'cart' => $cart
+        ]);
+    }
+
     public function completeSale() {
         $cart = session('cart', []);
 
@@ -161,7 +198,7 @@ class ProductController extends Controller
                     'price' => $item['price'],
                     'sold_at' => now()
                 ]);
-    
+
                 $product = Product::findOrFail($productId);
                 $product->decrement('quantity', $item['quantity']);
 
@@ -172,18 +209,18 @@ class ProductController extends Controller
                 } catch(\Exception $e) {
                     log_to_db('error', 'Telegram alert failed');
                 }
-                
+
             }
 
             DB::commit();
-    
+
             session()->forget('cart');
-            
+
             return redirect()->route('product.index')->with('success', 'Sale recorded successfully');
         }catch(\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Failed to complete sale.');
-        }        
+        }
     }
 
     public function sendTelegramMessage($product, $message) {

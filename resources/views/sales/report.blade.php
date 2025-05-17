@@ -49,7 +49,7 @@
 @endsection
 
 
-@section('scripts')
+@section('script')
 {{-- Include Chart.js first --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 

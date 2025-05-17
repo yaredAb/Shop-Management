@@ -41,6 +41,10 @@ nav{
     align-items: center;
     padding: 10px;
     border-radius: 5px;
+    position: relative;
+}
+#toggle-menu{
+    display: none;
 }
 nav .logo{
     font-size: 40px;
@@ -63,6 +67,8 @@ nav ul{
     color: var(--bg);
     transition: background-color 0.3s ease-in;
 }
+
+
 .total-sale{
     padding: 10px;
     display: flex;
@@ -103,10 +109,11 @@ nav ul{
 .filtering-section .categories{
     display: flex;
     width: 80%;
+    flex-wrap: nowrap;
     overflow-x: scroll;
     scrollbar-width: none;
 }
-.categories button{
+.categories button {
     padding: 5px 10px;
     background-color: var(--bg);
     color: var(--secondary);
@@ -114,7 +121,13 @@ nav ul{
     border-radius: 8px;
     font-size: 18px;
     margin-left: 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
+
+
+
+
 .product-section{
     display: flex;
     gap: 5px;
@@ -141,6 +154,7 @@ nav ul{
     border-radius: 5px;
     padding: 5px;
     background-color: var(--primary);
+    position: relative;
 }
 .product img{
     width: 100%;
@@ -161,8 +175,6 @@ nav ul{
     font-size: 30px;
 }
 .product p{
-    padding: 0;
-    margin: 0;
     font-size: 24px;
     text-transform: capitalize;
 }
@@ -180,6 +192,16 @@ nav ul{
     padding: 5px;
     text-transform: capitalize;
     border-radius: 5px;
+}
+.product .price-section {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 10px;
+    background-color: var(--top);
+    color: var(--primary);
+    font-size: 18px;
+    border-bottom-left-radius: 10px;
 }
 
 .product button{
@@ -220,13 +242,13 @@ nav ul{
 .cart-products p{
     font-size: 20px;
 }
-.price-section{
+.cart-product .price-section{
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 10px;
 }
-.price-section button{
+.cart-product .price-section button{
     padding: 4px 8px;
     font-size: 18px;
 }
@@ -245,7 +267,7 @@ nav ul{
     transform: translate(-50%, -50%);
     top: 50%;
     left: 50%;
-    
+
 }
 .form-wrapper{
     background-color: var(--bottom);
@@ -334,6 +356,11 @@ nav ul{
    font-size: 18px;
    width: max-content;
 }
+.table-wrapper{
+    width: 100%;
+    overflow-x: scroll;
+    scrollbar-width: none;
+}
 .order-table{
     width: 100%;
     margin-bottom: 20px;
@@ -408,6 +435,7 @@ tr:hover{
 }
 .cat-wrapper{
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     margin-top: 20px;
 }
@@ -504,7 +532,7 @@ tr:hover{
     font-size: 40px;
     color: var(--secondary);
     font-family: "Josefin sans", sans-serif;
-    
+
 }
 .login-form{
     display: flex;
@@ -523,7 +551,7 @@ tr:hover{
     font-size: 18px;
 }
 .login-wrapper button{
-    padding: 10px;      
+    padding: 10px;
     font-size: 18px;
     width: 50%;
     align-self: center;
@@ -545,6 +573,7 @@ tr:hover{
 }
 .setting-container{
     display: flex;
+    max-width: 100%;
 }
 .setting-main{
     display: flex;
@@ -653,8 +682,236 @@ tr:hover{
     color: var(--secondary);
     padding: 10px;
 }
-
-
 .question{
     font-size: 20px;
+}
+.mobile-cart{
+    display: none;
+}
+.icon-container {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .icon-container{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .cart{
+        width: 30px;
+    }
+    .cartContainer{
+        position: relative;
+    }
+    .cart_count{
+        position: absolute;
+        top: -10px;
+        right: -8px;
+        color: var(--primary);
+        z-index: 2;
+        width: 25px;
+        height: 25px;
+        font-weight: bold;
+        background-color: var(--warning);
+        border-radius: 50%;
+        text-align: center;
+    }
+    .message{
+        font-size: 20px;
+    }
+
+    .cart-body-wrapper{
+        height: 80vh;
+        overflow-y: scroll;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .cart-body{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    .cart-body p{
+        font-size: 20px;
+        font-weight: 600;
+    }
+    .cart-body .cart-qty{
+        display: flex;
+        gap: 10px;
+        font-size: 16px;
+        align-items: center;
+    }
+    .cart-qty button{
+        padding: 4px 8px;
+        font-size: 18px;
+    }
+    .cart-qty span{
+        font-size: 18px;
+    }
+    .total-cart{
+        font-size: 20px;
+        font-weight: 600;
+    }
+    .purchase{
+        padding: 10px;
+        background-color: var(--top);
+        color: var(--primary);
+        border: none;
+        font-size: 18px;
+        border-radius: 5px;
+        width: 100%;
+        margin-top: 10px;
+    }
+    .wrapper{
+        padding: 10px;
+    }
+    #toggle-menu{
+        display: block;
+    }
+    nav .logo{
+        font-size: 24px;
+    }
+    .nav-links{
+        opacity: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-in, opacity 0.3s ease-in;
+        position: absolute;
+        top: 40px;
+        right: 0;
+        padding: 15px;
+        background-color: var(--primary);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 1000;
+    }
+    .nav-links.open{
+        max-height: 500px;
+        opacity: 1;
+    }
+    .total-sale p{
+        font-size: 16px;
+    }
+    .total-sale h2{
+        font-size: 18px;
+    }
+
+    .filtering-section{
+        flex-direction: column;
+        gap: 20px;
+        padding: 0;
+    }
+    .filtering-section .search-form{
+        width: 100%;
+    }
+    .filtering-section input{
+        border-radius: 30px;
+    }
+    .filtering-section .categories{
+        width: 100%;
+    }
+    .categories button {
+        padding: 5px;
+    }
+    .cart-container{
+        display: none;
+    }
+    .product-section{
+        overflow-y: auto;
+    }
+    .products-wrapper{
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .products-row{
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+    }
+    .products-row .product{
+        flex-shrink: 0;
+        height: 300px;
+    }
+    .product img{
+        height: 170px;
+    }
+
+    .cat-header h1{
+        font-size: 20px;
+        font-weight: 500;
+    }
+
+    .cat-header a{
+        background-color: var(--bottom);
+        color: var(--secondary);
+        font-size: 16px;
+        border-radius: 5px;
+        padding: 8px;
+    }
+
+
+    .report-card-container{
+        flex-direction: column;
+        justify-content: start;
+        gap: 10px;
+    }
+    .report-card-container .report-card{
+        width: 100%;
+        padding: 10px 0;
+        gap: 10px;
+    }
+    .report-card span{
+        font-size: 20px;
+    }
+    .report-card p{
+        font-size: 16px;
+    }
+    .chart{
+        flex-direction: column;
+        justify-content: start;
+        gap: 50px;
+    }
+    .reportChart{
+        width: 100%;
+        height: 250px;
+    }
+
+
+    .form-container{
+        padding: 10px;
+        transform: translate(0);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        top: 0;
+        left: 0;
+        max-width: 100%;
+    }
+    .form-container h2{
+        font-size: 24px;
+    }
+    .form-wrapper{
+        width: 100%;
+        padding: 20px 10px;
+    }
+    .setting-container{
+        flex-direction: column;
+        gap: 10px;
+    }
+    .setting-main{
+        width: 100%;
+    }
+    .sub-title{
+        margin-top: 10px;
+    }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SaleController;
@@ -16,6 +17,8 @@ Route::middleware(['auth'])->group(function() {
     Route::post('/add-to-cart/{product}', [ProductController::class, 'addToCart'])->name('cart.add');
     Route::post('/cart/increase/{id}', [ProductController::class, 'increaseQuantity'])->name('cart.increase');
     Route::post('/cart/decrease/{id}', [ProductController::class, 'decreaseQuantity'])->name('cart.decrease');
+    Route::post('/cart/update', [ProductController::class, 'updateQuantity'])->name('cart.update');
+    Route::get('/cart/list', [CartController::class, 'list'])->name('cart.list');
 
     Route::post('/checkout', [ProductController::class, 'completeSale'])->name('checkout');
 

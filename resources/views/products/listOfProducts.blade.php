@@ -19,8 +19,9 @@
         </div>
     @endif
 
-    <table class="order-table">
-        <thead>
+    <div class="table-wrapper">
+        <table class="order-table">
+            <thead>
             <tr>
                 <th>Product</th>
                 <th>Category</th>
@@ -30,8 +31,8 @@
                 <th>Created at</th>
                 <th>Action</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             @foreach($products as $product)
                 <tr>
                     <td>{{ $product->name }}</td>
@@ -43,7 +44,8 @@
                     <td class="actions">
                         <a href="{{route('products.edit', $product)}}" class="editBtn">Edit</a>
 
-                        <form action="{{route('products.destroy', $product)}}" method="POST" onsubmit="return(confirm('Are you sure you want to delete this product?'))">
+                        <form action="{{route('products.destroy', $product)}}" method="POST"
+                              onsubmit="return(confirm('Are you sure you want to delete this product?'))">
                             @method('DELETE')
                             @csrf
 
@@ -52,7 +54,8 @@
                     </td>
                 </tr>
             @endforeach
-        </tbody>
-    </table>
-    
+            </tbody>
+        </table>
+    </div>
+
 @endsection

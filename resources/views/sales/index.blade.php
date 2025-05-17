@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1>Order History</h1>
+    <div class="cat-header"><h1>Order History</h1></div>
 
     @if(session('success'))
         <div class="bg-green-100 text-green-700 p-2 rounded mb-4">
@@ -15,8 +15,9 @@
         </div>
     @endif
 
-    <table class="order-table">
-        <thead>
+    <div class="table-wrapper">
+        <table class="order-table">
+            <thead>
             <tr>
                 <th class="p-2">Product</th>
                 <th class="p-2">Quantity</th>
@@ -24,8 +25,8 @@
                 <th class="p-2">Total</th>
                 <th class="p-2">Date</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             @foreach($orders as $order)
                 <tr>
                     <td>{{ $order->product->name ?? 'N/A' }}</td>
@@ -36,6 +37,7 @@
 
                 </tr>
             @endforeach
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 @endsection
