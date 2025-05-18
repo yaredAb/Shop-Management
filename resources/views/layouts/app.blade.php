@@ -8,7 +8,7 @@
             use App\Models\Setting;
             use Carbon\Carbon;
 
-            $dailyTime = Setting::getValue('daily_hour');
+            $dailyTime = Setting::getValue('daily_hour') ?? '00:00';
             $currentTime = Carbon::now()->format('H:i');
             $scheduled_time = Carbon::createFromFormat('H:i', $dailyTime);
         @endphp
