@@ -46,11 +46,10 @@
                         <button type="submit">Save</button>
                     </form>
                     {{-- Small functionalities setup --}}
-                    <h3 class="sub-title">Time Setup and other settings</h3>
+                    <h3 class="sub-title">Time Setup to recieve daily report at telegram</h3>
                     <form action="{{route('settings.setTimer')}}" class="account-form" method="POST">
                         @csrf
             
-                        <label for="dailyHour">Set the time to see "Daily Report" button every day.</label>
                         <input type="time" name="dailyHour" id="dailyHour" value="{{\App\Models\Setting::getValue('daily_hour')}}">
                         <div class="form-inline">
                             <button type="submit">Set</button>
