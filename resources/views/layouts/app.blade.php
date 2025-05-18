@@ -4,18 +4,6 @@
     <div class="wrapper">
         @include('components.navigation')
 
-        @php
-            use App\Models\Setting;
-            use Carbon\Carbon;
-
-            $dailyTime = Setting::getValue('daily_hour') ?? '00:00';
-            $currentTime = Carbon::now()->format('H:i');
-            $scheduled_time = Carbon::createFromFormat('H:i', $dailyTime);
-        @endphp
-        @if ($dailyTime <= $currentTime && $user_role === 'admin')
-            <a href="{{route('dailyReport')}}" class="sendDailyReport">Export Daily Report</a>
-        @endif
-
         @yield('content')
     </div>
 

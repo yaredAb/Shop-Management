@@ -247,7 +247,7 @@ class ProductController extends Controller
                 $message = "⚠️ Low Stock Alert!\nProduct: {$updatedProduct->name}\nRemaining: {$updatedProduct->quantity}";
                 try{
                     if($updatedProduct->quantity <= $updatedProduct->stock_threshold) {
-                        \App\Helper\TelegramHelper::sendTelegramMessage($updatedProduct, $message);
+                        \App\Helper\TelegramHelper::sendTelegramMessage($message);
                     }
 
                 } catch(\Exception $e) {
