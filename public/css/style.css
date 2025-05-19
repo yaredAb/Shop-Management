@@ -6,10 +6,7 @@
     --bg2: #f0f0f0;
     --warning: rgb(241, 92, 92);
 }
-*{
-    margin: 0;
-    padding: 0;
-}
+
 li{
     list-style: none;
 }

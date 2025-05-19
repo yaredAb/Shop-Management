@@ -3,7 +3,7 @@
 @section('content')
     <div class="cat-header">
         <h1>Users list</h1>
-        <a href="#">Add User</a>
+        <a href="{{route('register.form')}}">Add User</a>
     </div>
     <div class="table-wrapper">
         <table class="order-table">

@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SettingsController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function() {
@@ -42,6 +43,14 @@ Route::middleware(['auth'])->group(function() {
 
     Route::get('/users', [SettingsController::class, 'userList'])->name('userList');
     Route::delete('/users/{user}', [SettingsController::class, 'deleteUser'])->name('users.delete');
+
+    Route::post('/logout', function() {
+        Auth::logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+
+        return redirect('/');
+    })->name('logout');
 });
 
 
