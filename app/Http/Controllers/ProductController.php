@@ -67,6 +67,7 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             'has_expiry' => 'nullable|boolean',
             'expiry_date' => 'nullable|date|required_if:has_expiry, true',
+            'country' => 'nullable',
         ]);
 
         Product::create([
@@ -78,6 +79,7 @@ class ProductController extends Controller
             'category_id' => $request->category_id,
             'has_expiry' => $request->has('has_expiry'),
             'expiry_date' => $request->has('has_expiry') ? $request->expiry_date : null,
+            'country' => $request->country
         ]);
 
         return redirect()->route('products.index')->with('success', 'Product created');
@@ -117,6 +119,7 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             'has_expiry' => 'nullable|boolean',
             'expiry_date' => 'nullable|date|required_if:has_expiry, true',
+            'country' => 'nullable|required',
         ]);
 
 
@@ -129,6 +132,7 @@ class ProductController extends Controller
             'category_id' => $request->category_id,
             'has_expiry' => $request->has('has_expiry'),
             'expiry_date' => $request->has('has_expiry') ? $request->expiry_date : null,
+            'country' => $request->country
         ]);
         return redirect()->route('products.index')->with('success', 'Product updated');
     }

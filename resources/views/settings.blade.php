@@ -73,6 +73,17 @@
                         <label for="button_color">Button Color</label>
                         <input type="color" name="button_color" id="button_color" value="{{App\Models\Setting::getValue('button_color') ?? '#3A59D1'}}" class="color-box">
                     </div>
+                    <div class="flex gap-3">
+                        <input type="hidden" name="does_expiry" value="0">
+                        <input type="checkbox" name="does_expiry" id="has_expiry" value="1" {{App\Models\Setting::getValue('does_expiry') ? 'checked' : ''}} class="w-5">
+                        <label for="has_expiry">Does your products have expiry dates</label>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <input type="hidden" name="does_country" value="0">
+                        <input type="checkbox" name="does_country" id="has_conutry" value="1" {{App\Models\Setting::getValue('does_country') ? 'checked' : ''}} class="w-5">
+                        <label for="has_conutry">Does your products have different countries</label>
+                    </div>
                     <button type="submit">Update</button>
                 </form>
             </div>

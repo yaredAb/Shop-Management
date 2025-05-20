@@ -41,7 +41,10 @@ class SettingsController extends Controller
             'background_color' => 'required|string',
             'primary_color' => 'required|string',
             'secondary_color' => 'required|string',
-            'site_title' => 'required|string'
+            'site_title' => 'required|string',
+            'button_color' => 'required|string',
+            'does_expiry' => 'required|boolean',
+            'does_country' => 'required|boolean'
         ]);
 
         Setting::setValue('background_color', $request->background_color);
@@ -49,6 +52,8 @@ class SettingsController extends Controller
         Setting::setValue('secondary_color', $request->secondary_color);
         Setting::setValue('button_color', $request->button_color);
         Setting::setValue('site_title', $request->site_title);
+        Setting::setValue('does_expiry', $request->does_expiry);
+        Setting::setValue('does_country', $request->does_country);
 
         return redirect()->back()->with('success', 'Customization updated');
     }

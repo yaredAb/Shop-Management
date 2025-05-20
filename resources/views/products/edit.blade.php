@@ -10,6 +10,12 @@
                 @method('PUT')
                 <p>Name:</p>
                 <input type="text" name="name" value="{{ $product->name }}" required>
+                 
+                @if (App\Models\Setting::getValue('does_country') == true)
+                    <p>Country:</p>
+                    <input type="text" name="country" value="{{$product->country}}" class=" rounded-sm @error('country') border-1 border-red-500 @enderror">
+                @endif
+                
                 <p>Bought Price:</p>
                 <input type="number" step="0.01" name="bought_price" value="{{ $product->bought_price }}" required>
                 <p>Sale Price:</p>
@@ -26,16 +32,19 @@
                         </option>
                     @endforeach
                 </select>
-                <p>
+                @if (App\Models\Setting::getValue('does_expiry') == true)
+                    <p>
                     <label>
                         <input type="checkbox" name="has_expiry" id="has_expiry" {{$product->has_expiry ? 'checked' : ''}}>
                         Has Expiry Date?
                     </label>
-                </p>
-                <div id="expiry_date_wrapper" style="display: none;">
-                    <p>Expiry Date:</p>
-                    <input type="date" name="expiry_date" id="expiry_date" value="{{ $product->expiry_date }}">
-                </div>
+                    </p>
+                    <div id="expiry_date_wrapper" style="display: none;">
+                        <p>Expiry Date:</p>
+                        <input type="date" name="expiry_date" id="expiry_date" value="{{ $product->expiry_date }}">
+                    </div>
+                @endif
+                
                 <button type="submit">Save</button>
             </form>
         </div>

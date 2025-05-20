@@ -8,6 +8,12 @@
                     @csrf
                     <p>Name:</p>
                     <input type="text" name="name" value="{{old('name')}}" class=" rounded-sm @error('name') border-1 border-red-500 @enderror">
+
+                    @if (App\Models\Setting::getValue('does_country') == true)
+                        <p>Country:</p>
+                        <input type="text" name="country" value="{{old('country')}}" class=" rounded-sm @error('country') border-1 border-red-500 @enderror">
+                    @endif
+
                     <p>Bought Price:</p>
                     <input type="number" step="0.01" name="bought_price" value="{{old('bought_price')}}" class=" rounded-sm @error('bought_price') border-1 border-red-500 @enderror">
                     <p>Sale Price:</p>
@@ -23,16 +29,18 @@
                             <option value="{{$category->id}}">{{$category->name}}</option>
                         @endforeach
                     </select>
-                    <p>
+                    @if (App\Models\Setting::getValue('does_expiry') == true)
+                        <p>
                         <label>
                             <input type="checkbox" name="has_expiry" id="has_expiry">
                             Has Expiry Date?
                         </label>
-                    </p>
-                    <div id="expiry_date_wrapper" style="display: none;">
-                        <p>Expiry Date:</p>
-                        <input type="date" name="expiry_date" id="expiry_date" value="{{ old('expiry_date') }}">
-                    </div>
+                        </p>
+                        <div id="expiry_date_wrapper" style="display: none;">
+                            <p>Expiry Date:</p>
+                            <input type="date" name="expiry_date" id="expiry_date" value="{{ old('expiry_date') }}">
+                        </div>
+                    @endif
                     <button type="submit">Save</button>
                 </form>
             </div>
