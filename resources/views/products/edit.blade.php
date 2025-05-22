@@ -35,7 +35,7 @@
                 @if (App\Models\Setting::getValue('does_expiry') == true)
                     <p>
                     <label>
-                        <input type="checkbox" name="has_expiry" id="has_expiry" {{$product->has_expiry ? 'checked' : ''}}>
+                        <input type="checkbox" name="has_expiry" id="has_expiry" {{$product->expiry_date ? 'checked' : ''}}>
                         Has Expiry Date?
                     </label>
                     </p>
