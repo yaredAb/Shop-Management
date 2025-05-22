@@ -119,7 +119,7 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             'has_expiry' => 'nullable|boolean',
             'expiry_date' => 'nullable|date|required_if:has_expiry, true',
-            'country' => 'nullable|required',
+            'country' => 'nullable',
         ]);
 
 
