@@ -33,7 +33,7 @@
                             </div>
                         @endif
 
-                        <p>{{$product->name}}</p>
+                        <p>{{$product->name}} @if($product->country) <span class="text-purple-500">({{$product->country}})</span> @endif</p>
 
                         <div class="stock-quantity">
                             <span><strong>QTY: </strong>{{$product->quantity}}</span>
