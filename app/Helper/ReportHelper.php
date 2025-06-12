@@ -2,6 +2,7 @@
 
 namespace App\Helper;
 
+use App\Models\Log;
 use App\Models\Product;
 use App\Models\Sale;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -39,8 +40,9 @@ class ReportHelper
         $caption = "📄 Daily Sales Report for " . $today->toFormattedDateString();
         //send to telegram
         TelegramHelper::sendTelegramMessageFile($filePath, $fileName, $caption);
-        unlink($filePath);
+        Log::saveLog('green', 'Daily report is sent successfully');
 
+        unlink($filePath);
         return back()->with('success', 'Daily report send to Telegram');
     }
 

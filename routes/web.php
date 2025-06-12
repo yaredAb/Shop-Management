@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\LogController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SettingsController;
@@ -16,8 +17,6 @@ Route::middleware(['auth'])->group(function() {
     Route::get('/products-list', [ProductController::class, 'listOfProducts'])->name('products.list');
 
     Route::post('/add-to-cart/{product}', [ProductController::class, 'addToCart'])->name('cart.add');
-    Route::post('/cart/increase/{id}', [ProductController::class, 'increaseQuantity'])->name('cart.increase');
-    Route::post('/cart/decrease/{id}', [ProductController::class, 'decreaseQuantity'])->name('cart.decrease');
     Route::post('/cart/update', [ProductController::class, 'updateQuantity'])->name('cart.update');
     Route::get('/cart/list', [CartController::class, 'list'])->name('cart.list');
 
@@ -48,9 +47,11 @@ Route::middleware(['auth'])->group(function() {
         Auth::logout();
         request()->session()->invalidate();
         request()->session()->regenerateToken();
-
+        \App\Models\Log::saveLog('orange', 'Logged Out');
         return redirect('/');
     })->name('logout');
+
+    Route::get('/logs', [LogController::class, 'index'])->name('logs.index');
 });
 
 

@@ -58,10 +58,10 @@
 
 
                         <span class="price-section">{{number_format($product->sale_price)}} Birr</span>
-                        <form action="{{route('cart.add', $product->id)}}" method="POST">
-                            @csrf
-                            <button type="submit">Add to cart</button>
-                        </form>
+{{--                        <form action="{{route('cart.add', $product->id)}}" method="POST">--}}
+{{--                            @csrf--}}
+                            <button class="add-to-cart cursor-pointer" data-id="{{$product->id}}">Add to cart</button>
+{{--                        </form>--}}
                     </div>
                 @endforeach
             </div>
@@ -69,77 +69,68 @@
 
         <div class="cart-container">
             <h2>Cart</h2>
-            <div class="cart-products">
-                @php
-                    $cart = session('cart', []);
-                @endphp
-
-                @if (count($cart) > 0)
-                    @foreach ($cart as $id=>$item)
-                        <div class="cart-product">
-                            <p class="cart-name">{{$item['name']}}</p>
-                            <div class="price-section">
-
-                                    <button class="update-cart" data-id="{{$id}}" data-action="decrease">-</button>
-                                    <span>{{$item['quantity']}}</span>
-                                    <button class="update-cart" data-id="{{$id}}" data-action="increase">+</button>
-                                    <span> x {{number_format($item['price'])}} = {{number_format($item['price'] * $item['quantity'])}}</span>
-
-                            </div>
-                        </div>
-                    @endforeach
-
-                    @php
-
-                        $total = 0;
-                        foreach ($cart as $item) {
-                            $total += $item['price'] * $item['quantity'];
-                        }
-                    @endphp
-                    <div class="cart-total">
-                        <hr>
-                        <p class="total-cart">Total: {{number_format($total)}} Birr</p>
-                    </div>
-
-                    <form action="{{route('checkout')}}" method="POST">
-                        @csrf
-                        <button type="submit" class="purchase-btn">Purchase</button>
-                    </form>
-
-                    @else
-                        <p>No product in the cart</p>
-                @endif
+            <div class="cart-products" id="cart-section">
+                @include('partials.cart', ['cart' => session('cart', [])])
             </div>
         </div>
     </div>
 @endsection
 @section('script')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const updateButtons = document.querySelectorAll('.update-cart');
+        $(document).on('click', '.add-to-cart', function(e) {
+            e.preventDefault();
 
-            updateButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const id = this.getAttribute('data-id')
-                    const action = this.getAttribute('data-action')
+            var productId = $(this).data('id');
 
-                    fetch("{{route('cart.update')}}", {
-                        method: 'POST',
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        },
-                        body: JSON.stringify({id, action})
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if(data.success) {
-                                location.reload();
-                            }
-                        })
-                })
+            $.ajax({
+                url: '/add-to-cart/' + productId,
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+
+                    $('#cart-section').html(response.cart_html);
+                },
+                error: function (xhr) {
+                    alert('Something went wrong')
+                }
             })
         })
+
+        $(document).on('click', '.increase-qty', function () {
+            let productId = $(this).data('id');
+            updateQty(productId, 'increase');
+        });
+
+        $(document).on('click', '.decrease-qty', function () {
+            let productId = $(this).data('id');
+            updateQty(productId, 'decrease');
+        });
+
+        function updateQty(productId, action) {
+            $.ajax({
+                url: '/cart/update/',
+                method: 'POST',
+                data: {
+                    _token: '{{csrf_token()}}',
+                    id: productId,
+                    action: action
+                },
+                success: function (response) {
+                    $('#cart-section').html(response.cart_html)
+                },
+                error: function (xhr) {
+                    if(xhr.responseJson && xhr.responseJson.error){
+                        alert(xhr.responseJson.error);
+                    } else{
+                        alert('Failed to update cart');
+                    }
+                }
+            })
+        }
+
     </script>
 @endsection
 

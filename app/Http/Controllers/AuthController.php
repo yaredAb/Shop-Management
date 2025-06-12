@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Log;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -55,9 +56,11 @@ class AuthController extends Controller
 
         if(Auth::attempt($credentials)) {
             $request->session()->regenerate();
+            Log::saveLog('green', $request->username . ' is Logged In.');
             return redirect()->route('products.index');
         }
-        return back()->withErrors(['username' => 'Invaid credentials']);
+        Log::saveLog('red', $request->username . ' is tried to log in with invalid credentials');
+        return back()->withErrors(['username' => 'Invalid credentials']);
     }
 
 
@@ -73,6 +76,8 @@ class AuthController extends Controller
             'password' => Hash::make($validated['password']),
             'privilage' => $validated['privilage'],
         ]);
+
+        Log::saveLog('Green', 'Account with username of '. $validated['username'] . ' is created  ');
 
         return redirect()->route('login')->with('success', 'Registered successfully');
     }
@@ -98,7 +103,7 @@ class AuthController extends Controller
 
     public function updatePassword(Request $request) {
         $request->validate(['password' => 'required|min:6']);
-        
+
         $user = Auth::user();
 
         if(!$user) {
@@ -107,6 +112,7 @@ class AuthController extends Controller
 
         $user->password = Hash::make($request->password);
         $user->save();
+        Log::saveLog('Green', $user->username . '\'s password updated ');
         return redirect()->back()->with('success', 'Password Updated Successfully');
     }
 
@@ -115,7 +121,7 @@ class AuthController extends Controller
             'username' => 'required|string',
             'password' => 'required|min:6'
         ]);
-        
+
         $user = User::where('username', $request->username)->first();
 
         if(!$user) {
@@ -126,5 +132,5 @@ class AuthController extends Controller
         $user->save();
         return redirect()->route('login');
     }
-    
+
 }

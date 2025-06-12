@@ -2,14 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Log;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Helper\UserHelper;
 
 class SettingsController extends Controller
 {
     public function showSetting() {
+        if(UserHelper::userInfo()['privilage'] != 'admin') {
+            Log::saveLog('red', UserHelper::userInfo()['username'] . ' is tried to access the settings page');
+            return redirect('/');
+        }
         $user = Auth::user();
         return view('settings', compact('user'));
     }
@@ -55,16 +61,21 @@ class SettingsController extends Controller
         Setting::setValue('does_expiry', $request->does_expiry);
         Setting::setValue('does_country', $request->does_country);
 
+        Log::saveLog('green', 'Settings customization updated');
         return redirect()->back()->with('success', 'Customization updated');
     }
 
     public function userList() {
+        if(UserHelper::userInfo()['privilage'] == 'user') {
+            return redirect('/');
+        }
         $users = User::orderBy('created_at')->get();
         return view('auth.userList', compact('users'));
     }
 
     public function deleteUser(User $user) {
         $user->delete();
+        Log::saveLog('green', 'User has been deleted');
         return redirect()->back();
     }
 }

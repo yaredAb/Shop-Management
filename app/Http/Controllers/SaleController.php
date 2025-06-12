@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helper\TelegramHelper;
+use App\Helper\UserHelper;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\Setting;
@@ -17,6 +18,9 @@ class SaleController extends Controller
 {
 
     public function index() {
+        if(UserHelper::userInfo()['privilage'] == 'user') {
+            return redirect('/');
+        }
         $orders = Sale::with('product')
             ->orderBy('sold_at', 'desc')
             ->get();
@@ -26,6 +30,9 @@ class SaleController extends Controller
 
 
     public function monthlyReport(Request $request) {
+        if(UserHelper::userInfo()['privilage'] == 'user') {
+            return redirect('/');
+        }
         $month = $request->input('month', now()->format('Y-m'));
 
         //parse the input
@@ -130,41 +137,5 @@ class SaleController extends Controller
 
         return $pdf->download('Monthly_Sales_Report_' . $month . '.pdf');
     }
-
-    public function sendDailyReport() {
-        $today = Carbon::today();
-        $sales = Sale::whereDate('sold_at', $today)->get();
-
-        $totalRevenue = $sales->sum(function ($sale) {
-            return $sale->price * $sale->quantity;
-        });
-
-        $lowStockProducts = Product::whereColumn('quantity', '<=', 'stock_threshold')->get();
-
-
-        $expiringSoon = Product::whereBetween('expiry_date', [$now, $sixMonthsFromNow])->get();
-
-        $pdf = FacadePdf::loadView('sales.daily_report', [
-            'sales' => $sales,
-            'totalRevenue' => $totalRevenue,
-            'lowStockProducts' => $lowStockProducts,
-            'expiringSoon' => $expiringSoon,
-            'date' => $today->toFormattedDateString()
-        ]);
-
-        $fileName = 'daily_report_'. $today->format('Y_m_d'). '.pdf';
-        $filePath = storage_path('app/' . $fileName);
-
-        file_put_contents($filePath, $pdf->output());
-        $caption = "📄 Daily Sales Report for " . $today->toFormattedDateString();
-        //send to telegram
-        TelegramHelper::sendTelegramMessageFile($filePath, $fileName, $caption);
-        unlink($filePath);
-
-        return back()->with('success', 'Daily report send to Telegram');
-
-    }
-
-
 
 }

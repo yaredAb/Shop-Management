@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Log;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\Setting;
 use Carbon\Carbon;
+use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -134,6 +136,8 @@ class ProductController extends Controller
             'expiry_date' => $request->has('has_expiry') ? $request->expiry_date : null,
             'country' => $request->country
         ]);
+
+        Log::saveLog('green', 'A product '. $request->name . 'has been updated');
         return redirect()->route('products.index')->with('success', 'Product updated');
     }
 
@@ -143,6 +147,7 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
+        Log::saveLog('red', 'A product '. $product->name . 'has been deleted');
         return redirect()->back()->with('success', 'Product deleted ');
     }
 
@@ -156,38 +161,20 @@ class ProductController extends Controller
             $cart[$product->id] = [
                 'name' => $product->name,
                 'price' => $product->sale_price,
-                'quantity' => 1
+                'quantity' => 1,
+                'stock' => $product->quantity
             ];
         }
 
         session()->put('cart', $cart);
 
-        return redirect()->back()->with('success', "{$product->name} added to cart");
-    }
+        //return redirect()->back()->with('success', "{$product->name} added to cart");
+        $cartHtml = view('partials.cart', ['cart' => $cart])->render();
 
-    public function increaseQuantity($id) {
-        $cart = session()->get('cart', []);
-
-        if(isset($cart[$id])) {
-            $cart[$id]['quantity'] += 1;
-            session()->put('cart', $cart);
-        }
-
-        return redirect()->back();
-    }
-
-    public function decreaseQuantity($id){
-        $cart = session()->get('cart', []);
-        if(isset($cart[$id])) {
-            $cart[$id]['quantity'] -= 1;
-
-            if($cart[$id]['quantity'] <= 0) {
-                unset($cart[$id]);
-            }
-            session()->put('cart', $cart);
-        }
-
-        return redirect()->back();
+        return response()->json([
+            'message' => "{$product->name} added to cart",
+            'cart_html' => $cartHtml
+        ]);
     }
 
     public function  updateQuantity(Request $request)
@@ -198,7 +185,15 @@ class ProductController extends Controller
 
         if(isset($cart[$id])) {
             if($action == 'increase') {
-                $cart[$id]['quantity'] += 1;
+                if ($cart[$id]['quantity'] < $cart[$id]['stock']) {
+                    $cart[$id]['quantity'] += 1;
+                } else{
+                    return \response()->json([
+                        'error' => 'Cannot add morethan avaliable stock',
+                        'cart_html' => view('partials.cart', ['cart' => $cart])->render()
+                    ], 400);
+                }
+
             } else if($action == 'decrease') {
                 if($cart[$id]['quantity'] > 1) {
                     $cart[$id]['quantity'] -= 1;
@@ -209,21 +204,8 @@ class ProductController extends Controller
             session(['cart' => $cart]);
         }
 
-        $total = 0;
-        foreach ($cart as $item) {
-            $total += $item['price'] * $item['quantity'];
-        }
-
-        if(!empty($cart)) {
-            session()->put('cart_open', true);
-        } else{
-            session()->forget('cart_open');
-        }
-
         return response()->json([
-            'success' => true,
-            'total' => $total,
-            'cart' => $cart
+            'cart_html' => view('partials.cart', ['cart' => $cart])->render()
         ]);
     }
 
@@ -263,10 +245,11 @@ class ProductController extends Controller
             DB::commit();
 
             session()->forget('cart');
-
+            Log::saveLog('green', 'Sale Completed');
             return redirect()->route('product.index')->with('success', 'Sale recorded successfully');
         }catch(\Exception $e) {
             DB::rollBack();
+            Log::saveLog('red', 'Failed to complete sale');
             return redirect()->back()->with('error', 'Failed to complete sale.');
         }
     }
