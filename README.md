@@ -56,7 +56,7 @@ A full-featured Laravel-based application designed to streamline day-to-day shop
 
 ## 🧰 Tech Stack
 
-- **Framework:** Laravel 10.x
+- **Framework:** Laravel 12.x
 - **Language:** PHP 8.1+
 - **Database:** MySQL / MariaDB
 - **Charting:** Chart.js
@@ -83,3 +83,8 @@ php artisan migrate --seed
 
 # Serve the app
 php artisan serve
+
+#Install npm package
+npm install
+
+npm run dev
