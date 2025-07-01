@@ -6,15 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sale extends Model
 {
-    public function product() {
-        return $this->belongsTo(Product::class);
-    }
-
-    public function refund() {
-        return $this->hasMany(Refund::class);
-    }
-
     protected $fillable = [
-        'product_id', 'quantity', 'price', 'sold_at'
+        'pharmacist_id', 'cashier_id', 'total', 'status', 'sold_at'
     ];
+
+    public function pharmacist()
+    {
+        return $this->belongsTo(User::class, 'pharmacist_id');
+    }
+
+    public function cashier()
+    {
+        return $this->belongsTo(User::class, 'cashier_id');
+    }
+
+    public function items()
+    {
+        return $this->hasMany(SaleItem::class);
+    }
+
 }

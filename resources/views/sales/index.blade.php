@@ -23,19 +23,24 @@
                 <th class="p-2">Quantity</th>
                 <th class="p-2">Price</th>
                 <th class="p-2">Total</th>
+                <th class="p-2">Sold by</th>
                 <th class="p-2">Date</th>
             </tr>
             </thead>
             <tbody>
             @foreach($orders as $order)
-                <tr>
-                    <td>{{ $order->product->name ?? 'N/A' }}</td>
-                    <td>{{ $order->quantity }}</td>
-                    <td>{{ number_format($order->price) }} Birr</td>
-                    <td>{{ number_format($order->price * $order->quantity) }} Birr</td>
-                    <td>{{ \Carbon\Carbon::parse($order->sold_at)->format('F d, Y h:i A') }}</td>
-
-                </tr>
+                @foreach($order->items as $item)
+                    <tr>
+                        <td>{{ $item->product->name ?? 'N/A' }}</td>
+                        <td>{{ $item->quantity }}</td>
+                        <td>{{ number_format($item->price) }} Birr</td>
+                        <td>{{ number_format($item->price * $item->quantity) }} Birr</td>
+                        <td>
+                            {{ $order->cashier->username ?? $order->pharmacist->name ?? 'N/A' }}
+                        </td>
+                        <td>{{ \Carbon\Carbon::parse($order->sold_at)->format('F d, Y h:i A') }}</td>
+                    </tr>
+                @endforeach
             @endforeach
             </tbody>
         </table>

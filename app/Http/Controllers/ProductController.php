@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ProductSold;
 use App\Models\Category;
 use App\Models\Log;
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\SaleItem;
+use App\Models\SaleItems;
 use App\Models\Setting;
 use Carbon\Carbon;
 use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Mockery\Exception;
 
 class ProductController extends Controller
 {
@@ -24,6 +28,15 @@ class ProductController extends Controller
             ->where('quantity', '>', 0)
             ->orderBy('created_at', 'desc');
 
+        $today = Carbon::today();
+        $sales = Sale::with('items.product')->whereDate('sold_at', $today)->get();
+
+        $totalRevenue = $sales->sum(function ($sale) {
+            return $sale->items->sum(function ($item) {
+                return $item->price * $item->quantity;
+            });
+        });
+
         //applying search
         if($request->filled('product_name')) {
             $products->where('name', 'like', '%'. $request->product_name . '%');
@@ -34,12 +47,12 @@ class ProductController extends Controller
             $products->where('category_id', $request->category_id);
         }
 
-        $todaysSale = Sale::whereDate('sold_at', today())->sum(DB::raw('price * quantity'));
+        //$todaysSale = Sale::whereDate('sold_at', today())->sum(DB::raw('price * quantity'));
 
         return view('products.index', [
             'products' => $products->get(),
             'categories' => Category::all(),
-            'todaySale' => $todaysSale
+            'todaySale' => $totalRevenue
         ]);
     }
 
@@ -65,7 +78,7 @@ class ProductController extends Controller
             'bought_price' => 'required|numeric',
             'sale_price' => 'required|numeric',
             'quantity' => 'required|integer',
-            'stock_threshold' => 'required|integer',
+            'stock_threshold' => 'nullable|integer',
             'category_id' => 'required|exists:categories,id',
             'has_expiry' => 'nullable|boolean',
             'expiry_date' => 'nullable|date|required_if:has_expiry, true',
@@ -77,7 +90,7 @@ class ProductController extends Controller
             'bought_price' => $request->bought_price,
             'sale_price' => $request->sale_price,
             'quantity' => $request->quantity,
-            'stock_threshold' => $request->stock_threshold,
+            'stock_threshold' => $request->stock_threshold ?? 5,
             'category_id' => $request->category_id,
             'has_expiry' => $request->has('has_expiry'),
             'expiry_date' => $request->has('has_expiry') ? $request->expiry_date : null,
@@ -117,7 +130,7 @@ class ProductController extends Controller
             'bought_price' => 'required|numeric',
             'sale_price' => 'required|numeric',
             'quantity' => 'required|integer',
-            'stock_threshold' => 'required|integer',
+            'stock_threshold' => 'integer',
             'category_id' => 'required|exists:categories,id',
             'has_expiry' => 'nullable|boolean',
             'expiry_date' => 'nullable|date|required_if:has_expiry, true',
@@ -154,6 +167,8 @@ class ProductController extends Controller
     public function addToCart(Request $request, Product $product) {
         $cart = session()->get('cart', []);
 
+        $country = $product->country ? $product->country : '';
+
         if(isset($cart[$product->id])) {
             $cart[$product->id]['quantity']+=1;
         }
@@ -161,6 +176,7 @@ class ProductController extends Controller
             $cart[$product->id] = [
                 'name' => $product->name,
                 'price' => $product->sale_price,
+                'country' => $country,
                 'quantity' => 1,
                 'stock' => $product->quantity
             ];
@@ -173,7 +189,8 @@ class ProductController extends Controller
 
         return response()->json([
             'message' => "{$product->name} added to cart",
-            'cart_html' => $cartHtml
+            'cart_html' => $cartHtml,
+            'cart_count' => count($cart),
         ]);
     }
 
@@ -205,8 +222,48 @@ class ProductController extends Controller
         }
 
         return response()->json([
-            'cart_html' => view('partials.cart', ['cart' => $cart])->render()
+            'cart_html' => view('partials.cart', ['cart' => $cart])->render(),
+            'cart_count' => count($cart),
         ]);
+    }
+
+    public function sendToCashier()
+    {
+        $cart = session('cart', []);
+        if(empty($cart)) {
+            return redirect()->back()->with('error', 'Cart is empty');
+        }
+
+        DB::beginTransaction();
+        try{
+            $total = 0;
+            foreach ($cart as $item){
+                $total += $item['price'] * $item['quantity'];
+            }
+
+            $sale = Sale::create([
+                'pharmacist_id' => auth()->id(),
+                'status' => 'pending',
+                'total' => $total,
+                'sold_at' => null
+            ]);
+
+            foreach ($cart as $productId => $item){
+                $sale->items()->create([
+                    'product_id' => $productId,
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                ]);
+            }
+
+            DB::commit();
+
+            session()->forget('cart');
+            return redirect()->route('products.index')->with('success', 'Sale recorded successfully');
+        } catch (Exception $e){
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to send to cashier');
+        }
     }
 
     public function completeSale() {
@@ -245,12 +302,55 @@ class ProductController extends Controller
             DB::commit();
 
             session()->forget('cart');
-            Log::saveLog('green', 'Sale Completed');
+            // Log::saveLog('green', 'Sale Completed');
             return redirect()->route('product.index')->with('success', 'Sale recorded successfully');
         }catch(\Exception $e) {
             DB::rollBack();
             Log::saveLog('red', 'Failed to complete sale');
             return redirect()->back()->with('error', 'Failed to complete sale.');
+        }
+    }
+
+    public function proceedDirect(Request $request)
+    {
+        $cart = session('cart', []);
+        if(empty($cart)){
+            return back()->with('error', 'Cart is empty');
+        }
+
+        DB::beginTransaction();
+        try{
+            $sale = Sale::create([
+                'pharmacist_id' => auth()->id(),
+                'cashier_id' => auth()->id(),
+                'total' => collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']),
+                'status' => 'completed',
+                'sold_at' => now()
+            ]);
+
+            foreach ($cart as $productId => $item)
+            {
+                $product = Product::findOrFail($productId);
+                SaleItem::create([
+                    'sale_id' => $sale->id,
+                    'product_id' => $productId,
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                ]);
+
+                $product->decrement('quantity', $item['quantity']);
+
+                if ($product->quantity <= $product->stock_threshold) {
+                    \App\Helper\TelegramHelper::sendTelegramMessage("⚠️ Low Stock Alert!\nProduct: {$product->name}\nRemaining: {$product->quantity}");
+                }
+            }
+            DB::commit();
+            session()->forget('cart');
+            event(new ProductSold($product));
+            return redirect()->route('products.index')->with('success', 'Sale recorded successfully');
+        } catch (Exception $e){
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to proceed');
         }
     }
 

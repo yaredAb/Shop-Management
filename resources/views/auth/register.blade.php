@@ -20,6 +20,10 @@
                 <input type="text" id="username" name="username" class="border border-gray-400" value="{{old('username')}}">
             </div>
             <div class="login-form">
+                <label for="email">Email</label>
+                <input type="text" id="email" name="email" class="border border-gray-400" value="{{old('email')}}">
+            </div>
+            <div class="login-form">
                 <label for="password">Password</label>
                 <input type="password" name="password" id="password" class="border border-gray-400">
             </div>
@@ -32,7 +36,8 @@
                 <select name="privilage" class="px-5 py-2 border border-gray-400">
                     <option value="">--select privilage--</option>
                     <option value="user">User</option>
-                    <option value="admin">Adminstrator</option>
+                    <option value="admin">Administrator</option>
+                    <option value="cashier">Cashier</option>
                 </select>
             </div>
             <button type="submit">Register</button>

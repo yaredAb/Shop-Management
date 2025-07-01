@@ -2,9 +2,12 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CashierController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ForgetPasswordController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Auth;
@@ -19,8 +22,9 @@ Route::middleware(['auth'])->group(function() {
     Route::post('/add-to-cart/{product}', [ProductController::class, 'addToCart'])->name('cart.add');
     Route::post('/cart/update', [ProductController::class, 'updateQuantity'])->name('cart.update');
     Route::get('/cart/list', [CartController::class, 'list'])->name('cart.list');
+    Route::post('/cart/delete', [CartController::class, 'delete_cart_item']);
 
-    Route::post('/checkout', [ProductController::class, 'completeSale'])->name('checkout');
+    Route::post('/checkout', [ProductController::class, 'sendToCashier'])->name('checkout');
 
     Route::get('/sales/report', [SaleController::class, 'monthlyReport'])->name('sales.report');
 
@@ -52,19 +56,23 @@ Route::middleware(['auth'])->group(function() {
     })->name('logout');
 
     Route::get('/logs', [LogController::class, 'index'])->name('logs.index');
+
+    Route::get('/cashier/index', [CashierController::class, 'index'])->name('cashier.index');
+    Route::post('/proceed/direct', [ProductController::class, 'proceedDirect'])->name('proceed.direct');
 });
 
 
+Route::middleware(['guest'])->group(function() {
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login']);
 
-Route::get('/login', [AuthController::class, 'showLogin'])->middleware('guest')->name('login');
-Route::post('/login', [AuthController::class, 'login']);
+    Route::get('/register', function() {
+        return view('auth.register');
+    })->name('register.form');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
 
-Route::get('/register', function() {
-    return view('auth.register');
-})->name('register.form');
-Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
-
-Route::post('/forget_password/qa', [AuthController::class, 'forget_password'])->name('forget_password');
-Route::get('/forget_password/username_check', [AuthController::class, 'username_entry'])->name('username_entry');
-Route::post('/forget_password/validate_answer', [AuthController::class, 'validate_answer'])->name('validate_answer');
-Route::post('/resete_password', [AuthController::class, 'resetePassword'])->name('resetePassword');
+    Route::get('forget-password', [ForgetPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('forget-password', [ForgetPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+    Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
+});

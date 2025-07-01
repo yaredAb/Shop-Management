@@ -6,6 +6,7 @@ use App\Helper\TelegramHelper;
 use App\Helper\UserHelper;
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\SaleItem;
 use App\Models\Setting;
 use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
 use Carbon\Carbon;
@@ -21,9 +22,10 @@ class SaleController extends Controller
         if(UserHelper::userInfo()['privilage'] == 'user') {
             return redirect('/');
         }
-        $orders = Sale::with('product')
+        $orders = Sale::with(['items.product', 'cashier', 'pharmacist'])
             ->orderBy('sold_at', 'desc')
             ->get();
+
 
         return view('sales.index', compact('orders'));
     }
@@ -39,27 +41,37 @@ class SaleController extends Controller
         $start = Carbon::parse($month . '-01')->startOfMonth();
         $end = $start->copy()->endOfMonth();
 
-        $sales = Sale::whereBetween('sold_at', [$start, $end])->get();
+        //$sales = Sale::whereBetween('sold_at', [$start, $end])->get();
 
-        $totalRevenue = $sales->sum(function($sale) {
-            return $sale->price * $sale->quantity;
-        });
+        $totalRevenue = SaleItem::whereHas('sale', function ($query) use ($start, $end) {
+            $query->whereBetween('sold_at', [$start, $end])
+                ->where('status', 'completed');
+        })->sum(DB::raw('price * quantity'));
 
-        $topProduct = Sale::select('product_id', DB::raw('SUM(quantity) as total_quantity'))
-            ->whereBetween('sold_at', [$start, $end])
+
+        $topProduct = SaleItem::select('product_id', DB::raw('SUM(quantity) as total_quantity'))
+            ->whereHas('sale', function ($query) use ($start, $end) {
+                $query->whereBetween('sold_at', [$start, $end])->where('status', 'completed');
+            })
             ->groupBy('product_id')
             ->orderByDesc('total_quantity')
             ->with('product')
             ->first();
 
-        $topDay = Sale::select(DB::raw('DATE(sold_at) as day'), DB::raw('SUM(price * quantity) as total'))
-            ->whereBetween('sold_at', [$start, $end])
+
+        $topDay = SaleItem::select(DB::raw('DATE(sales.sold_at) as day'), DB::raw('SUM(sale_items.price * sale_items.quantity) as total'))
+            ->join('sales', 'sale_items.sale_id', '=', 'sales.id')
+            ->whereBetween('sales.sold_at', [$start, $end])
+            ->where('sales.status', 'completed')
             ->groupBy('day')
             ->orderByDesc('total')
             ->first();
 
-        $dailySales = Sale::select(DB::raw('DATE(sold_at) as date'), DB::raw('SUM(price * quantity) as total'))
-            ->whereBetween('sold_at', [$start, $end])
+
+        $dailySales = SaleItem::select(DB::raw('DATE(sales.sold_at) as date'), DB::raw('SUM(sale_items.price * sale_items.quantity) as total'))
+            ->join('sales', 'sale_items.sale_id', '=', 'sales.id')
+            ->whereBetween('sales.sold_at', [$start, $end])
+            ->where('sales.status', 'completed')
             ->groupBy('date')
             ->orderBy('date')
             ->get();
@@ -68,29 +80,35 @@ class SaleController extends Controller
         $chartData = $dailySales->pluck('total')->toArray();
 
 
-        $top5Products = Sale::select('product_id', DB::raw('SUM(quantity) as total_sold'))
-            ->whereBetween('sold_at', [$start, $end])
+
+        $top5Products = SaleItem::select('product_id', DB::raw('SUM(quantity) as total_sold'))
+            ->whereHas('sale', function ($query) use ($start, $end) {
+                $query->whereBetween('sold_at', [$start, $end])->where('status', 'completed');
+            })
             ->groupBy('product_id')
             ->with('product')
             ->orderByDesc('total_sold')
             ->take(5)
             ->get();
 
-            //preparing fot pie chart
-            $pieLabels = $top5Products->pluck('product.name');
-            $pieData = $top5Products->pluck('total_sold');
+        $pieLabels = $top5Products->pluck('product.name');
+        $pieData = $top5Products->pluck('total_sold');
 
 
-            $hourlySales = Sale::select(DB::raw('HOUR(sold_at) as hour'), DB::raw('SUM(price * quantity) as total'))
-                ->whereBetween('sold_at', [$start, $end])
-                ->groupBy('hour')
-                ->orderBy('hour')
-                ->get();
 
-            $hourLabels = $hourlySales->pluck('hour')->map(function ($h) {
-                return str_pad($h, 2, '0', STR_PAD_LEFT) . ':00';
-            });
-            $hourData = $hourlySales->pluck('total');
+        $hourlySales = SaleItem::select(DB::raw('HOUR(sales.sold_at) as hour'), DB::raw('SUM(sale_items.price * sale_items.quantity) as total'))
+            ->join('sales', 'sale_items.sale_id', '=', 'sales.id')
+            ->whereBetween('sales.sold_at', [$start, $end])
+            ->where('sales.status', 'completed')
+            ->groupBy('hour')
+            ->orderBy('hour')
+            ->get();
+
+        $hourLabels = $hourlySales->pluck('hour')->map(function ($h) {
+            return str_pad($h, 2, '0', STR_PAD_LEFT) . ':00';
+        });
+        $hourData = $hourlySales->pluck('total');
+
 
         return view('sales.report', [
             'month' => $month,

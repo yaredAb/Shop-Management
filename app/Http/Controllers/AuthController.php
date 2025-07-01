@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UserRegistered;
 use App\Models\Log;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -65,72 +66,56 @@ class AuthController extends Controller
 
 
     public function register(Request $request) {
+
+        $messages = [
+            'password.regex' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
+        ];
+
         $validated = $request->validate([
             'username' => 'required|unique:users',
-            'password' => 'required|min:6|confirmed',
-            'privilage' => 'required|in:user,admin'
-        ]);
+            'email' => 'required|unique:users|email',
+            'password' => [
+                'required',
+                'confirmed',
+                'min:6',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/'
+            ],
+            'privilage' => 'required|in:user,admin,cashier'
+        ], $messages);
 
         $user = User::create([
             'username' => $validated['username'],
+            'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'privilage' => $validated['privilage'],
         ]);
 
         Log::saveLog('Green', 'Account with username of '. $validated['username'] . ' is created  ');
+        event(new UserRegistered($user));
 
         return redirect()->route('login')->with('success', 'Registered successfully');
     }
 
-    public function securityQA(Request $request) {
-        $request->validate([
-            'security_question' => 'required|string',
-            'security_answer' => 'required|string'
+    public function updatePassword(Request $request)
+    {
+        $user = Auth::id();
+        $messages = [
+            'password.regex' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.'
+        ];
+        $request->validate(['password' => [
+                'required',
+                'min:6',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/'
+            ]
+        ], $messages);
+
+        User::where('id', $user)->update([
+            'password' => Hash::make($request->password)
         ]);
 
-        $user = Auth::user();
-
-        if (!$user) {
-            return redirect()->route('login')->withErrors(['auth' => 'You must be logged in to set a security question.']);
-        }
-
-        $user->security_question = $request->security_question;
-        $user->security_answer = $request->security_answer;
-        $user->save();
-
-        return redirect()->back()->with('success', 'Security question and answer saved');
+        return back()->with('success', 'Password Updated successfully');
     }
 
-    public function updatePassword(Request $request) {
-        $request->validate(['password' => 'required|min:6']);
 
-        $user = Auth::user();
-
-        if(!$user) {
-            return redirect()->route('login')->withErrors(['auth' => 'You must be logged in to set a security question.']);
-        }
-
-        $user->password = Hash::make($request->password);
-        $user->save();
-        Log::saveLog('Green', $user->username . '\'s password updated ');
-        return redirect()->back()->with('success', 'Password Updated Successfully');
-    }
-
-    public function resetePassword(Request $request) {
-        $request->validate([
-            'username' => 'required|string',
-            'password' => 'required|min:6'
-        ]);
-
-        $user = User::where('username', $request->username)->first();
-
-        if(!$user) {
-            return redirect()->route('login')->withErrors(['auth' => 'No username provided.']);
-        }
-
-        $user->password = Hash::make($request->password);
-        $user->save();
-        return redirect()->route('login');
-    }
 
 }

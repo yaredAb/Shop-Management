@@ -22,6 +22,10 @@
                     <input type="number" name="quantity" value="{{old('quantity')}}" class=" rounded-sm @error('quantity') border-1 border-red-500 @enderror">
                     <p>Stock Threshold:</p>
                     <input type="number" name="stock_threshold" value="{{old('stock_threshold')}}" class=" rounded-sm @error('stock_threshold') border-1 border-red-500 @enderror">
+                    @error('stock_threshold')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                        
+                    @enderror
                     <p>Category:</p>
                     <select name="category_id" class=" rounded-sm @error('category_id') border-1 border-red-500 @enderror">
                         <option value="">--select category--</option>

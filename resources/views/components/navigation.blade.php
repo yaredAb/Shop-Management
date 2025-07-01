@@ -7,7 +7,7 @@ $cart = session('cart', []);
     <div class="icon-container">
         <a href="{{route('cart.list')}}" class="cartContainer">
             <img src="{{asset('./img/cart.png')}}" class="cart" alt="Cart">
-            <span class="cart_count">{{count($cart)}}</span>
+            <span class="cart_count">{{count(session('cart', []))}}</span>
         </a>
         <img src="{{asset('./img/menu2.png')}}" id="toggle-menu" alt="">
     </div>
@@ -25,7 +25,7 @@ $cart = session('cart', []);
             <li><a href="{{route('settings')}}">Settings</a></li>
         @endif
         <li>
-            <form method="POST" action="{{route('logout')}}">@csrf<button class="text-lg text-red-600 bg-red-300">Logout</button></form>
+            <form method="POST" action="{{route('logout')}}">@csrf<button class="text-lg text-red-600 bg-red-200 py-1 px-2 rounded">Logout</button></form>
         </li>
     </ul>
 </nav>

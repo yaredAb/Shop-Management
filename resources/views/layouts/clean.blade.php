@@ -7,6 +7,7 @@
     @vite('resources/css/app.css')
     <title>Document</title>
     <link rel="stylesheet" href="{{asset('css/style.css')}}">
+    @livewireStyles
 </head>
 
 <style>
@@ -21,5 +22,6 @@
 
 @yield('childContent')
 @yield('scripts')
+@livewireScripts
 </body>
 </html>

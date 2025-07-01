@@ -2,11 +2,11 @@
 
     @section('childContent')
         <div class="auth-wrapper">
-            <form class="login-wrapper" action="{{route('login')}}" method="POST">
+            <form class="login-wrapper" action="{{route('password.email')}}" method="POST">
                 @csrf
 
                 <a href="/" class="logo">{{$site_title}}</a>
-
+                <p class="font-medium text-lg">Forget Password</p>
                 @if ($errors->any())
                     <div class="bg-red-200 p-2">
                         <ul>
@@ -16,18 +16,20 @@
                         </ul>
                     </div>
                 @endif
+
+                @if (session('status'))
+                    <div class="p-2 bg-green-300">
+                        <p class="text-lg py-1 text-center text-green-700">{{session('status')}}</p>
+                    </div>
+                @endif
                 <div class="login-form">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" value="{{old('username')}}" class="border border-gray-400">
+                    <label for="email">Email</label>
+                    <input type="text" id="email" name="email" value="{{old('email')}}" class="border border-gray-400">
                 </div>
-                <div class="login-form">
-                    <label for="password">Password</label>
-                    <input type="password" name="password" id="password" class="border border-gray-400">
-                </div>
-                <button type="submit">Login</button>
+                <button type="submit">Send Validation Link</button>
             </form>
             <div class="auth-links">
-                <a href="{{route('password.request')}}">forget password</a>
+                <a href="{{route('login')}}">Back to login</a>
             </div>
         </div>
     @endsection

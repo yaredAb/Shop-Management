@@ -58,10 +58,7 @@
 
 
                         <span class="price-section">{{number_format($product->sale_price)}} Birr</span>
-{{--                        <form action="{{route('cart.add', $product->id)}}" method="POST">--}}
-{{--                            @csrf--}}
-                            <button class="add-to-cart cursor-pointer" data-id="{{$product->id}}">Add to cart</button>
-{{--                        </form>--}}
+                        <button class="add-to-cart cursor-pointer" data-id="{{$product->id}}">Add to cart</button>
                     </div>
                 @endforeach
             </div>
@@ -92,6 +89,12 @@
                 success: function(response) {
 
                     $('#cart-section').html(response.cart_html);
+                    $('.cart_count').fadeOut(150, function() {
+                        $(this).text(response.cart_count).fadeIn(150)
+                    });
+
+                    let toast = $('<div class="toast-msg">').text(response.message).hide().appendTo('body');
+                    toast.fadeIn(200).delay(1500).fadeOut(300);
                 },
                 error: function (xhr) {
                     alert('Something went wrong')
@@ -119,7 +122,10 @@
                     action: action
                 },
                 success: function (response) {
-                    $('#cart-section').html(response.cart_html)
+                    $('#cart-section').html(response.cart_html);
+                    $('.cart_count').fadeOut(150, function() {
+                        $(this).text(response.cart_count).fadeIn(150)
+                    });
                 },
                 error: function (xhr) {
                     if(xhr.responseJson && xhr.responseJson.error){
@@ -131,6 +137,27 @@
             })
         }
 
+        $(document).on('click', '.delete-item', function() {
+            $.ajax({
+                url: '/cart/delete',
+                method: 'POST',
+                data: {
+                    _token: '{{csrf_token()}}',
+                    id: $(this).data('id')
+                },
+                success: function(response){
+                    $('#cart-section').html(response.cart_html)
+                },
+                error: function(){
+                    if(xhr.responseJson && xhr.responseJson.error){
+                        alert(xhr.responseJson.error);
+                    } else{
+                        alert('Failed to delete cart item');
+                    }
+                }
+
+            })
+        })
+
     </script>
 @endsection
-

@@ -15,6 +15,10 @@ $dailyTime = Setting::getValue('daily_hour') ?? '00:00';
 if (!preg_match('/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/', $dailyTime)) {
     $dailyTime = '00:00'; // Fallback if invalid format
 }
+//Schedule::call(function () {
+//    ReportHelper::sendDailyReport();
+//})->dailyAt($dailyTime);
+
 Schedule::call(function () {
-    ReportHelper::sendDailyReport();
-})->dailyAt($dailyTime);
+    ReportHelper::sendNewDailyReport();
+})->dailyAt($dailyTime);;

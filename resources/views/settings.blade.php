@@ -7,36 +7,24 @@
             <div class="setting-main">
                 <div class="account-setting">
                     {{-- Account setting --}}
-                    <h3 class="sub-title">Account Setting</h3>
+                    <h3 class="text-lg font-semibold">Account Setting</h3>
                     <form action="{{route('updatePassword')}}" method="POST" class="account-form">
                         @csrf
                         <label for="username">Username</label>
                         <input type="text" id="username" value="{{$user->username}}" disabled>
                         <p>Change Password</p>
-                        <input type="password" name="password" id="password" required>
+                        @error('password')
+                            <span class="text-red-700 font-semibold text-sm">{{$message}}</span>
+                        @enderror
+                        @if(session('success'))
+                            <span class="text-green-700 font-semibold text-sm">{{session('success')}}</span>
+                        @endif
+                        <input type="password" name="password" id="password">
                         <button>Update</button>
                     </form>
-                    {{-- forget password form --}}
-                    <h3 class="sub-title">Forget Password Q&A</h3>
-                    @if (!$user->security_question || !$user->security_answer)
-                        <span class="warning-message">You need to set this up in order to change your password when you forget it!</span>
-                    @endif
-                    <form action="{{route('securityQA')}}" method="POST">
-                        @csrf
-                        <div class="form-inline">
-                            <p>Question</p>
-                            <input type="text" name="security_question" id="question" value="{{$user->security_question}}" required>
-                        </div>
-                        <div class="form-inline">
-                            <p>Answer</p>
-                            <input type="text" name="security_answer" id="answer" value="{{$user->security_answer}}" required>
-                        </div>
-                        <div class="form-inline">
-                            <button type="submit">Set</button>
-                        </div>
-                    </form>
+
                     {{-- Telegram notification keys --}}
-                    <h3 class="sub-title">Telegram keys</h3>
+                    <h3 class="text-lg font-semibold mt-5">Telegram keys</h3>
                     <form action="{{route('settings.setTelegramToken')}}" class="account-form" method="POST">
                         @csrf
                         <label for="bot_token">Bot Token</label>
@@ -46,10 +34,10 @@
                         <button type="submit">Save</button>
                     </form>
                     {{-- Small functionalities setup --}}
-                    <h3 class="sub-title">Time Setup to recieve daily report at telegram</h3>
+                    <h3 class="text-lg font-semibold mt-5">Time Setup to recieve daily report at telegram</h3>
                     <form action="{{route('settings.setTimer')}}" class="account-form" method="POST">
                         @csrf
-            
+
                         <input type="time" name="dailyHour" id="dailyHour" value="{{\App\Models\Setting::getValue('daily_hour')}}">
                         <div class="form-inline">
                             <button type="submit">Set</button>
@@ -58,7 +46,7 @@
                 </div>
             </div>
             <div class="setting-main">
-                <h3 class="sub-title">Site Customization</h3>
+                <h3 class="text-lg font-semibold">Site Customization</h3>
                 <form action="{{route('settings.updateCustemization')}}" class="color-form" method="POST">
                     @csrf
                     <div class="color-customizaion">
